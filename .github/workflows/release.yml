@@ -67,13 +67,15 @@ jobs:
           body: |
             ## What's Changed
             
-            ### Bug Fixes
-            - Fixed Folia compatibility issue where UpdateChecker was using direct Bukkit scheduler calls
-            - Plugin now properly loads on Folia servers without throwing UnsupportedOperationException
+            ### New Features
+            - Added automatic database fallback system - plugin now falls back to YAML storage if MySQL/SQLite connection fails
+            - Plugin remains functional while admins fix database configuration issues
+            - Clear warning messages displayed when fallback is active
             
             ### Technical Details
-            - Replaced `Bukkit.getScheduler()` calls with `SchedulerUtil` methods in UpdateChecker
-            - Maintains full compatibility with Paper and Purpur servers
+            - Database type tracking separated from configuration
+            - Graceful error handling for database initialization failures
+            - Config file remains unchanged during fallback mode
             
             **Full Changelog**: https://github.com/${{ github.repository }}/commits/v${{ steps.get_version.outputs.VERSION }}
           files: build/libs/InvRewind-*.jar
