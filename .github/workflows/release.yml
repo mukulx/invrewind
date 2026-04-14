@@ -64,7 +64,18 @@ jobs:
         with:
           tag_name: v${{ steps.get_version.outputs.VERSION }}
           name: InvRewind ${{ steps.get_version.outputs.VERSION }}
-          body: Highly configurable inventory backup and restore plugin for Paper, Purpur, and Folia.
+          body: |
+            ## What's Changed
+            
+            ### Bug Fixes
+            - Fixed Folia compatibility issue where UpdateChecker was using direct Bukkit scheduler calls
+            - Plugin now properly loads on Folia servers without throwing UnsupportedOperationException
+            
+            ### Technical Details
+            - Replaced `Bukkit.getScheduler()` calls with `SchedulerUtil` methods in UpdateChecker
+            - Maintains full compatibility with Paper and Purpur servers
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/commits/v${{ steps.get_version.outputs.VERSION }}
           files: build/libs/InvRewind-*.jar
           draft: false
           prerelease: false
