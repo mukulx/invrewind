@@ -18,7 +18,6 @@
 package dev.mukulx.invrewind.util;
 
 import dev.mukulx.invrewind.InvRewind;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -39,7 +38,7 @@ public class UpdateChecker {
     }
 
     public void checkForUpdates() {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
             try {
                 URL url = new URL(GITHUB_API);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -119,7 +118,7 @@ public class UpdateChecker {
     }
 
     private void notifyUpdate() {
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        SchedulerUtil.runTask(plugin, () -> {
             plugin.getLogger().info("========================================");
             plugin.getLogger().info("A new version is available!");
             plugin.getLogger().info("Current: " + plugin.getDescription().getVersion());
