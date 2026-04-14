@@ -1,0 +1,127 @@
+messages-version: 1
+
+settings:
+  prefix: '<gradient:#FF6B35:#F7931E>ɪɴᴠʀᴇᴡɪɴᴅ</gradient> <gray>»</gray> '
+  use-prefix: true
+
+general:
+  no-permission: '{prefix}<gradient:#FF4444:#CC0000>ʏᴏᴜ ᴅᴏɴ''ᴛ ʜᴀᴠᴇ ᴘᴇʀᴍɪssɪᴏɴ ᴛᴏ ᴅᴏ ᴛʜᴀᴛ!</gradient>'
+  player-not-found: '{prefix}<gradient:#FF4444:#CC0000>ᴘʟᴀʏᴇʀ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient> <gradient:#FF4444:#CC0000>ɴᴏᴛ ғᴏᴜɴᴅ!</gradient>'
+  player-offline: '{prefix}<gradient:#FF4444:#CC0000>ᴘʟᴀʏᴇʀ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient> <gradient:#FF4444:#CC0000>ᴍᴜsᴛ ʙᴇ ᴏɴʟɪɴᴇ ᴛᴏ ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ!</gradient>'
+  reload-success: '{prefix}<gradient:#00FF00:#00CC00>ᴄᴏɴғɪɢᴜʀᴀᴛɪᴏɴ ʀᴇʟᴏᴀᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+  database-error: '{prefix}<gradient:#FF4444:#CC0000>ᴅᴀᴛᴀʙᴀsᴇ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ. ᴄʜᴇᴄᴋ ᴄᴏɴsᴏʟᴇ ғᴏʀ ᴅᴇᴛᴀɪʟs.</gradient>'
+
+commands:
+  invrewind:
+    usage: '{prefix}<gradient:#FF4444:#CC0000>ᴜsᴀɢᴇ:</gradient> <gradient:#AAAAAA:#888888>/invrewind [player]</gradient>'
+    opening-gui: '{prefix}<gradient:#00FF88:#00CCAA>ᴏᴘᴇɴɪɴɢ ɪɴᴠᴇɴᴛᴏʀʏ ʀᴇsᴛᴏʀᴀᴛɪᴏɴ ᴍᴇɴᴜ...</gradient>'
+    no-backups: '{prefix}<gradient:#FF4444:#CC0000>ɴᴏ ʙᴀᴄᴋᴜᴘs ғᴏᴜɴᴅ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient><gradient:#FF4444:#CC0000>!</gradient>'
+  
+  forcebackup:
+    usage: '{prefix}<gradient:#FF4444:#CC0000>ᴜsᴀɢᴇ:</gradient> <gradient:#AAAAAA:#888888>/invrewindforce <all|player></gradient>'
+    backing-up-all: '{prefix}<gradient:#00FF88:#00CCAA>ʙᴀᴄᴋɪɴɢ ᴜᴘ ᴀʟʟ ᴏɴʟɪɴᴇ ᴘʟᴀʏᴇʀs...</gradient>'
+    backed-up-all: '{prefix}<gradient:#00FF88:#00CCAA>sᴜᴄᴄᴇssғᴜʟʟʏ ʙᴀᴄᴋᴇᴅ ᴜᴘ</gradient> <gradient:#FFAA00:#FF8800>{count}</gradient> <gradient:#00FF88:#00CCAA>ᴘʟᴀʏᴇʀs!</gradient>'
+    backing-up-player: '{prefix}<gradient:#00FF88:#00CCAA>ʙᴀᴄᴋɪɴɢ ᴜᴘ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient><gradient:#00FF88:#00CCAA>...</gradient>'
+    backed-up-player: '{prefix}<gradient:#00FF88:#00CCAA>sᴜᴄᴄᴇssғᴜʟʟʏ ʙᴀᴄᴋᴇᴅ ᴜᴘ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient><gradient:#00FF88:#00CCAA>!</gradient>'
+    failed: '{prefix}<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʙᴀᴄᴋᴜᴘ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient><gradient:#FF4444:#CC0000>!</gradient>'
+
+backup:
+  saved: '{prefix}<gradient:#00FF88:#00CCAA>ʏᴏᴜʀ ɪɴᴠᴇɴᴛᴏʀʏ ʜᴀs ʙᴇᴇɴ ʙᴀᴄᴋᴇᴅ ᴜᴘ!</gradient>'
+  scheduled-created: '{prefix}<gradient:#AA00FF:#8800CC>sᴄʜᴇᴅᴜʟᴇᴅ ʙᴀᴄᴋᴜᴘ ᴄʀᴇᴀᴛᴇᴅ!</gradient>'
+  types:
+    death: '<gradient:#FF0000:#CC0000>ᴅᴇᴀᴛʜ</gradient>'
+    world-change: '<gradient:#00FFFF:#00CCCC>ᴡᴏʀʟᴅ ᴄʜᴀɴɢᴇ</gradient>'
+    join: '<gradient:#00FF00:#00CC00>ᴊᴏɪɴ</gradient>'
+    quit: '<gradient:#FFAA00:#FF8800>ǫᴜɪᴛ</gradient>'
+    scheduled: '<gradient:#AA00FF:#8800CC>sᴄʜᴇᴅᴜʟᴇᴅ</gradient>'
+    manual: '<gradient:#FF00FF:#CC00CC>ᴍᴀɴᴜᴀʟ</gradient>'
+
+restore:
+  success: '{prefix}<gradient:#00FF88:#00CCAA>ɪɴᴠᴇɴᴛᴏʀʏ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+  failed: '{prefix}<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ!</gradient>'
+  overwrite-warning: '{prefix}<gradient:#FFAA00:#FF8800>ᴛʜɪs ᴡɪʟʟ ᴏᴠᴇʀᴡʀɪᴛᴇ ʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ɪɴᴠᴇɴᴛᴏʀʏ!</gradient>'
+  confirm: '{prefix}<gradient:#00FF88:#00CCAA>ᴄʟɪᴄᴋ ᴀɢᴀɪɴ ᴛᴏ ᴄᴏɴғɪʀᴍ ʀᴇsᴛᴏʀᴀᴛɪᴏɴ.</gradient>'
+  cancelled: '{prefix}<gradient:#FF4444:#CC0000>ʀᴇsᴛᴏʀᴀᴛɪᴏɴ ᴄᴀɴᴄᴇʟʟᴇᴅ.</gradient>'
+  teleported: '{prefix}<gradient:#00FFFF:#00CCCC>ᴛᴇʟᴇᴘᴏʀᴛᴇᴅ ᴛᴏ ʙᴀᴄᴋᴜᴘ ʟᴏᴄᴀᴛɪᴏɴ!</gradient>'
+  confirmation-required: '{prefix}<gradient:#FFAA00:#FF8800>ᴀʀᴇ ʏᴏᴜ sᴜʀᴇ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ {action}?</gradient> <gradient:#00FF88:#00CCAA>ᴛʏᴘᴇ</gradient> <gradient:#FFAA00:#FF8800>/invrewind confirm</gradient> <gradient:#00FF88:#00CCAA>ᴡɪᴛʜɪɴ {timeout} sᴇᴄᴏɴᴅs.</gradient>'
+  confirmation-expired: '{prefix}<gradient:#FF4444:#CC0000>ᴄᴏɴғɪʀᴍᴀᴛɪᴏɴ ᴇxᴘɪʀᴇᴅ!</gradient>'
+  no-pending-confirmation: '{prefix}<gradient:#FF4444:#CC0000>ɴᴏ ᴘᴇɴᴅɪɴɢ ᴄᴏɴғɪʀᴍᴀᴛɪᴏɴ!</gradient>'
+  inventory-cleared: '{prefix}<gradient:#00FF88:#00CCAA>ɪɴᴠᴇɴᴛᴏʀʏ ᴄʟᴇᴀʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+
+gui:
+  titles:
+    select-player: '<gradient:#FFAA00:#FF5555>sᴇʟᴇᴄᴛ ᴘʟᴀʏᴇʀ</gradient>'
+    select-backup-type: '<gradient:#55FFFF:#FF55FF>sᴇʟᴇᴄᴛ ʙᴀᴄᴋᴜᴘ ᴛʏᴘᴇ</gradient>'
+    select-backup: '<gradient:#FFD700:#FF8C00>sᴇʟᴇᴄᴛ ʙᴀᴄᴋᴜᴘ</gradient>'
+    backup-detail: '<gradient:#8A2BE2:#4B0082>ʙᴀᴄᴋᴜᴘ #{id}</gradient>'
+    ender-chest: '<gradient:#AA00AA:#550055>ᴇɴᴅᴇʀ ᴄʜᴇsᴛ - ʙᴀᴄᴋᴜᴘ #{id}</gradient>'
+  
+  previous-page: '<gradient:#00FF88:#00CCAA>ᴘʀᴇᴠɪᴏᴜs ᴘᴀɢᴇ</gradient>'
+  next-page: '<gradient:#00FF88:#00CCAA>ɴᴇxᴛ ᴘᴀɢᴇ</gradient>'
+  back: '<gradient:#FF4444:#CC0000>ʙᴀᴄᴋ</gradient>'
+  close: '<gradient:#FF4444:#CC0000>ᴄʟᴏsᴇ</gradient>'
+  
+  buttons:
+    restore-full: '<gradient:#00FF88:#00CCAA>ʀᴇsᴛᴏʀᴇ ғᴜʟʟ ʙᴀᴄᴋᴜᴘ</gradient>'
+    restore-inventory: '<gradient:#00FF88:#00CCAA>ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ</gradient>'
+    restore-inventory-only: '<gradient:#8B4513:#654321>ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ ᴏɴʟʏ</gradient>'
+    restore-armor-only: '<gradient:#4169E1:#1E90FF>ʀᴇsᴛᴏʀᴇ ᴀʀᴍᴏʀ ᴏɴʟʏ</gradient>'
+    restore-offhand-only: '<gradient:#FFD700:#FFA500>ʀᴇsᴛᴏʀᴇ ᴏғғʜᴀɴᴅ ᴏɴʟʏ</gradient>'
+    restore-enderchest-only: '<gradient:#AA00FF:#8800CC>ʀᴇsᴛᴏʀᴇ ᴇɴᴅᴇʀ ᴄʜᴇsᴛ ᴏɴʟʏ</gradient>'
+    restore-health-only: '<gradient:#FF0000:#CC0000>ʀᴇsᴛᴏʀᴇ ʜᴇᴀʟᴛʜ ᴏɴʟʏ</gradient>'
+    restore-hunger-only: '<gradient:#FF6600:#FF4400>ʀᴇsᴛᴏʀᴇ ʜᴜɴɢᴇʀ ᴏɴʟʏ</gradient>'
+    restore-xp-only: '<gradient:#7FFF00:#32CD32>ʀᴇsᴛᴏʀᴇ xᴘ ᴏɴʟʏ</gradient>'
+    restore-enderchest: '<gradient:#AA00FF:#8800CC>ʀᴇsᴛᴏʀᴇ ᴇɴᴅᴇʀ ᴄʜᴇsᴛ</gradient>'
+    view-enderchest: '<gradient:#AA00FF:#8800CC>ᴠɪᴇᴡ ᴇɴᴅᴇʀ ᴄʜᴇsᴛ</gradient>'
+    teleport-location: '<gradient:#00FFFF:#00CCCC>ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʟᴏᴄᴀᴛɪᴏɴ</gradient>'
+    export-shulker: '<gradient:#FFAA00:#FF8800>ᴇxᴘᴏʀᴛ ᴛᴏ sʜᴜʟᴋᴇʀ ʙᴏx</gradient>'
+    overwrite-current: '<gradient:#FF6600:#FF4400>ᴏᴠᴇʀᴡʀɪᴛᴇ ᴄᴜʀʀᴇɴᴛ</gradient>'
+    confirm: '<gradient:#00FF88:#00CCAA>ᴄᴏɴғɪʀᴍ</gradient>'
+    cancel: '<gradient:#FF4444:#CC0000>ᴄᴀɴᴄᴇʟ</gradient>'
+    force-backup: '<gradient:#FF00FF:#CC00CC>ғᴏʀᴄᴇ ʙᴀᴄᴋᴜᴘ</gradient>'
+  
+  lore:
+    backup-time: '<gray>ᴛɪᴍᴇ:</gray> <white>{time}</white>'
+    backup-type: '<gray>ᴛʏᴘᴇ:</gray> {type}'
+    backup-world: '<gray>ᴡᴏʀʟᴅ:</gray> <white>{world}</white>'
+    backup-location: '<gray>ʟᴏᴄᴀᴛɪᴏɴ:</gray> <white>{x}, {y}, {z}</white>'
+    backup-health: '<gray>ʜᴇᴀʟᴛʜ:</gray> <gradient:#FF0000:#CC0000>{health}</gradient>'
+    backup-hunger: '<gray>ʜᴜɴɢᴇʀ:</gray> <gradient:#FF6600:#FF4400>{hunger}</gradient>'
+    backup-xp: '<gray>xᴘ:</gray> <gradient:#00FF88:#00CCAA>{xp} ʟᴇᴠᴇʟs</gradient>'
+    click-to-view: '<gradient:#FFAA00:#FF8800>ᴄʟɪᴄᴋ ᴛᴏ ᴠɪᴇᴡ ʙᴀᴄᴋᴜᴘs</gradient>'
+    click-to-view-details: '<gradient:#FFAA00:#FF8800>ᴄʟɪᴄᴋ ᴛᴏ ᴠɪᴇᴡ ᴅᴇᴛᴀɪʟs</gradient>'
+    click-to-restore: '<gradient:#00FF88:#00CCAA>ᴄʟɪᴄᴋ ᴛᴏ ʀᴇsᴛᴏʀᴇ</gradient>'
+    click-to-teleport: '<gradient:#00FFFF:#00CCCC>ᴄʟɪᴄᴋ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ</gradient>'
+    click-to-backup: '<gradient:#FF00FF:#CC00CC>ᴄʟɪᴄᴋ ᴛᴏ ғᴏʀᴄᴇ ʙᴀᴄᴋᴜᴘ</gradient>'
+  
+  messages:
+    target-must-be-online: '{prefix}<gradient:#FF4444:#CC0000>ᴛᴀʀɢᴇᴛ ᴘʟᴀʏᴇʀ ᴍᴜsᴛ ʙᴇ ᴏɴʟɪɴᴇ!</gradient>'
+    inventory-restored: '{prefix}<gradient:#00FF88:#00CCAA>ɪɴᴠᴇɴᴛᴏʀʏ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    armor-restored: '{prefix}<gradient:#00FF88:#00CCAA>ᴀʀᴍᴏʀ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    offhand-restored: '{prefix}<gradient:#00FF88:#00CCAA>ᴏғғʜᴀɴᴅ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    enderchest-restored: '{prefix}<gradient:#00FF88:#00CCAA>ᴇɴᴅᴇʀ ᴄʜᴇsᴛ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    health-restored: '{prefix}<gradient:#00FF88:#00CCAA>ʜᴇᴀʟᴛʜ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    hunger-restored: '{prefix}<gradient:#00FF88:#00CCAA>ʜᴜɴɢᴇʀ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    xp-restored: '{prefix}<gradient:#00FF88:#00CCAA>xᴘ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    full-restored: '{prefix}<gradient:#00FF88:#00CCAA>ғᴜʟʟ ʙᴀᴄᴋᴜᴘ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
+    teleported: '{prefix}<gradient:#00FFFF:#00CCCC>ᴛᴇʟᴇᴘᴏʀᴛᴇᴅ ᴛᴏ ʙᴀᴄᴋᴜᴘ ʟᴏᴄᴀᴛɪᴏɴ!</gradient>'
+    backup-created: '{prefix}<gradient:#00FF88:#00CCAA>ʙᴀᴄᴋᴜᴘ ᴄʀᴇᴀᴛᴇᴅ ғᴏʀ {player}!</gradient>'
+    no-location-data: '{prefix}<gradient:#FF4444:#CC0000>ɴᴏ ʟᴏᴄᴀᴛɪᴏɴ ᴅᴀᴛᴀ ᴀᴠᴀɪʟᴀʙʟᴇ!</gradient>'
+    no-inventory-data: '{prefix}<gradient:#FF4444:#CC0000>ɴᴏ ɪɴᴠᴇɴᴛᴏʀʏ ᴅᴀᴛᴀ ᴀᴠᴀɪʟᴀʙʟᴇ!</gradient>'
+    no-enderchest-data: '{prefix}<gradient:#FF4444:#CC0000>ɴᴏ ᴇɴᴅᴇʀ ᴄʜᴇsᴛ ᴅᴀᴛᴀ ᴀᴠᴀɪʟᴀʙʟᴇ!</gradient>'
+    no-items-to-export: '{prefix}<gradient:#FF4444:#CC0000>ɴᴏ ɪᴛᴇᴍs ᴛᴏ ᴇxᴘᴏʀᴛ!</gradient>'
+    shulker-added: '{prefix}<gradient:#00FF88:#00CCAA>sʜᴜʟᴋᴇʀ ʙᴏx ᴀᴅᴅᴇᴅ ᴛᴏ ʏᴏᴜʀ ɪɴᴠᴇɴᴛᴏʀʏ!</gradient>'
+    shulkers-added: '{prefix}<gradient:#00FF88:#00CCAA>{count} sʜᴜʟᴋᴇʀ ʙᴏxᴇs ᴀᴅᴅᴇᴅ ᴛᴏ ʏᴏᴜʀ ɪɴᴠᴇɴᴛᴏʀʏ!</gradient>'
+    enderchest-exported: '{prefix}<gradient:#00FF88:#00CCAA>ᴇɴᴅᴇʀ ᴄʜᴇsᴛ ᴇxᴘᴏʀᴛᴇᴅ ᴛᴏ ᴘᴜʀᴘʟᴇ sʜᴜʟᴋᴇʀ ʙᴏx!</gradient>'
+    shulker-creation-failed: '{prefix}<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ᴄʀᴇᴀᴛᴇ sʜᴜʟᴋᴇʀ ʙᴏx!</gradient>'
+    fully-restored: '{prefix}<gradient:#00FF88:#00CCAA>ғᴜʟʟʏ ʀᴇsᴛᴏʀᴇᴅ ᴘʟᴀʏᴇʀ sᴛᴀᴛᴇ!</gradient>'
+    backup-created: '{prefix}<gradient:#00FF88:#00CCAA>ʙᴀᴄᴋᴜᴘ ᴄʀᴇᴀᴛᴇᴅ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient><gradient:#00FF88:#00CCAA>!</gradient>'
+  
+  type-names:
+    death: '<gradient:#FF0000:#CC0000>ᴅᴇᴀᴛʜ ʙᴀᴄᴋᴜᴘs</gradient>'
+    world-change: '<gradient:#00FFFF:#00CCCC>ᴡᴏʀʟᴅ ᴄʜᴀɴɢᴇ ʙᴀᴄᴋᴜᴘs</gradient>'
+    join: '<gradient:#00FF00:#00CC00>ᴊᴏɪɴ ʙᴀᴄᴋᴜᴘs</gradient>'
+    quit: '<gradient:#FFAA00:#FF8800>ǫᴜɪᴛ ʙᴀᴄᴋᴜᴘs</gradient>'
+    scheduled: '<gradient:#AA00FF:#8800CC>sᴄʜᴇᴅᴜʟᴇᴅ ʙᴀᴄᴋᴜᴘs</gradient>'
+    force: '<gradient:#FF00FF:#CC00CC>ғᴏʀᴄᴇ ʙᴀᴄᴋᴜᴘs</gradient>'
+    manual: '<gradient:#FF00FF:#CC00CC>ᴍᴀɴᴜᴀʟ ʙᴀᴄᴋᴜᴘs</gradient>'

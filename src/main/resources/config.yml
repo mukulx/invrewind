@@ -1,0 +1,266 @@
+# ██╗███╗   ██╗██╗   ██╗██████╗ ███████╗██╗    ██╗██╗███╗   ██╗██████╗ 
+# ██║████╗  ██║██║   ██║██╔══██╗██╔════╝██║    ██║██║████╗  ██║██╔══██╗
+# ██║██╔██╗ ██║██║   ██║██████╔╝█████╗  ██║ █╗ ██║██║██╔██╗ ██║██║  ██║
+# ██║██║╚██╗██║╚██╗ ██╔╝██╔══██╗██╔══╝  ██║███╗██║██║██║╚██╗██║██║  ██║
+# ██║██║ ╚████║ ╚████╔╝ ██║  ██║███████╗╚███╔███╔╝██║██║ ╚████║██████╔╝
+# ╚═╝╚═╝  ╚═══╝  ╚═══╝  ╚═╝  ╚═╝╚══════╝ ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝╚═════╝ 
+#
+# InvRewind Plugin Configuration
+# Plugin by: mukulx
+# Version: 1.0.0
+# GitHub: https://github.com/mukulx/invrewind
+# Issues: https://github.com/mukulx/invrewind/issues
+#
+# ================================================================
+# IMPORTANT: After changing this config, use /invrewind reload
+# ================================================================
+
+# Plugin Information & Core Settings
+plugin:
+  config-version: 1
+
+# ██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗
+# ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝
+# ██║  ██║███████║   ██║   ███████║██████╔╝███████║███████╗█████╗  
+# ██║  ██║██╔══██║   ██║   ██╔══██║██╔══██╗██╔══██║╚════██║██╔══╝  
+# ██████╔╝██║  ██║   ██║   ██║  ██║██████╔╝██║  ██║███████║███████╗
+# ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+# Database Configuration
+database:
+  # Database type: yaml, sqlite, or mysql
+  # YAML is recommended for easy backup export/import (default)
+  # SQLite is recommended for better performance on larger servers
+  # MySQL is recommended for multi-server setups
+  type: yaml
+  
+  # YAML Settings (file-based storage)
+  # Backups stored in organized folders by type and player
+  # Structure: backups/[type]/[player]/backup_[id].yml
+  yaml:
+    # Base folder for all backups (relative to plugin folder)
+    folder: 'backups'
+    
+    # Pretty print YAML files (easier to read but larger file size)
+    pretty-print: true
+  
+  # SQLite Settings (file-based database)
+  sqlite:
+    # Database file name (stored in plugin folder)
+    file: 'invrewind.db'
+  
+  # MySQL Settings (requires external database server)
+  mysql:
+    host: 'localhost'
+    port: 3306
+    database: 'invrewind'
+    username: 'root'
+    password: 'password'
+    
+    # Connection Pool Settings (MySQL only)
+    # These settings control how many database connections are maintained
+    pool:
+      # Maximum number of connections in the pool
+      maximum-pool-size: 10
+      
+      # Minimum number of idle connections to maintain
+      minimum-idle: 2
+      
+      # Maximum time (ms) to wait for a connection from the pool
+      connection-timeout: 30000
+      
+      # Maximum time (ms) a connection can remain idle before being removed
+      idle-timeout: 600000
+      
+      # Maximum lifetime (ms) of a connection in the pool
+      max-lifetime: 1800000
+
+# ██████╗  █████╗  ██████╗██╗  ██╗██╗   ██╗██████╗ 
+# ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██║   ██║██╔══██╗
+# ██████╔╝███████║██║     █████╔╝ ██║   ██║██████╔╝
+# ██╔══██╗██╔══██║██║     ██╔═██╗ ██║   ██║██╔═══╝ 
+# ██████╔╝██║  ██║╚██████╗██║  ██╗╚██████╔╝██║     
+# ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     
+# Automatic Backup Settings
+auto-backup:
+  # Create backup when player dies
+  on-death: true
+  
+  # Death event priority (currently always uses HIGHEST priority)
+  # HIGHEST = Captures inventory before it's cleared (recommended)
+  # This setting is kept for future compatibility but currently ignored
+  death-event-priority-low: false
+  
+  # Create backup when player changes worlds
+  on-world-change: true
+  
+  # Create backup when player joins server
+  on-join: true
+  
+  # Create backup when player quits server
+  on-quit: true
+  
+  # ═══════════════════════════════════════════════════════════
+  # SCHEDULED AUTO-BACKUPS
+  # Automatically backup player inventories at regular intervals
+  # ═══════════════════════════════════════════════════════════
+  scheduled:
+    # Enable scheduled auto-backups
+    enabled: false
+    
+    # Backup interval for all players (in minutes)
+    interval: 30
+    
+    # Only backup when player has moved since last backup
+    # Prevents unnecessary backups for AFK players
+    require-movement: true
+    
+    # Minimum items in inventory to create scheduled backup
+    # Set to 0 to always backup regardless of inventory
+    min-items: 1
+    
+    # Notify player when scheduled backup is created
+    notify-player: false
+  
+  # ═══════════════════════════════════════════════════════════
+  # BACKUP LIMITS
+  # Control how many backups are stored per player
+  # ═══════════════════════════════════════════════════════════
+  limits:
+    # Enable automatic cleanup of old backups
+    enabled: true
+    
+    # Maximum number of backups per player per type
+    # When limit is reached, oldest backup is deleted to make space
+    # Set to -1 for unlimited backups (not recommended)
+    max-per-type:
+      death: 50
+      world-change: 30
+      join: 20
+      quit: 20
+      scheduled: 40
+      force: 100
+
+# ███████╗███████╗ █████╗ ████████╗██╗   ██╗██████╗ ███████╗███████╗
+# ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██║   ██║██╔══██╗██╔════╝██╔════╝
+# █████╗  █████╗  ███████║   ██║   ██║   ██║██████╔╝█████╗  ███████╗
+# ██╔══╝  ██╔══╝  ██╔══██║   ██║   ██║   ██║██╔══██╗██╔══╝  ╚════██║
+# ██║     ███████╗██║  ██║   ██║   ╚██████╔╝██║  ██║███████╗███████║
+# ╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
+# Backup Features - What data to save in backups
+features:
+  # Save main inventory (hotbar + inventory slots)
+  save-inventory: true
+  
+  # Save armor (helmet, chestplate, leggings, boots)
+  save-armor: true
+  
+  # Save offhand item
+  save-offhand: true
+  
+  # Save ender chest contents
+  save-enderchest: true
+  
+  # Save player health
+  save-health: true
+  
+  # Save hunger level
+  save-hunger: true
+  
+  # Save experience (levels and progress)
+  save-xp: true
+  
+  # Save player location (world, coordinates, rotation)
+  save-location: true
+
+# ██████╗ ███████╗███████╗████████╗ ██████╗ ██████╗ ███████╗
+# ██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔═══██╗██╔══██╗██╔════╝
+# ██████╔╝█████╗  ███████╗   ██║   ██║   ██║██████╔╝█████╗  
+# ██╔══██╗██╔══╝  ╚════██║   ██║   ██║   ██║██╔══██╗██╔══╝  
+# ██║  ██║███████╗███████║   ██║   ╚██████╔╝██║  ██║███████╗
+# ╚═╝  ╚═╝╚══════╝╚══════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝
+# Restore & Action Settings
+restore:
+  # Target player must be online to restore their inventory
+  require-online: true
+  
+  # ═══════════════════════════════════════════════════════════
+  # RESTORE OPTIONS
+  # Configure what gets restored for each action
+  # ═══════════════════════════════════════════════════════════
+  
+  # Full restore (when clicking "Restore Inventory" button)
+  full-restore:
+    inventory: true
+    armor: true
+    offhand: true
+    enderchest: false  # Ender chest not restored by default
+    health: true
+    hunger: true
+    xp: true
+    location: false  # Location not restored by default
+  
+  # Overwrite current (when clicking "Overwrite Current" button)
+  overwrite:
+    inventory: true
+    armor: true
+    offhand: true
+    enderchest: false
+    health: false  # Don't change health when overwriting
+    hunger: false  # Don't change hunger when overwriting
+    xp: false  # Don't change XP when overwriting
+    location: false
+  
+  # Individual restore buttons (shown in GUI)
+  # Set to true to show the button in the backup detail GUI
+  # Note: Players can take items directly from the backup GUI
+  buttons:
+    restore-enderchest: true  # Opens ender chest view GUI
+    restore-xp: true
+    teleport-location: true
+
+# ████████╗██╗███╗   ███╗███████╗
+# ╚══██╔══╝██║████╗ ████║██╔════╝
+#    ██║   ██║██╔████╔██║█████╗  
+#    ██║   ██║██║╚██╔╝██║██╔══╝  
+#    ██║   ██║██║ ╚═╝ ██║███████╗
+#    ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝
+# Time Display Settings
+time:
+  # Time zone for displaying backup timestamps
+  # Examples: GMT, EST, PST, UTC, UTC+1, UTC-5, America/New_York, Europe/London
+  # Set to 'auto' to use the server's default time zone
+  zone: 'auto'
+  
+  # Time format for displaying backup timestamps
+  # Examples:
+  #   'dd/MM/yyyy HH:mm:ss' = 25/12/2024 14:30:45
+  #   'MM-dd-yyyy hh:mm:ss a' = 12-25-2024 02:30:45 PM
+  #   'yyyy-MM-dd HH:mm:ss z' = 2024-12-25 14:30:45 GMT
+  format: 'dd/MM/yyyy hh:mm:ss a z'
+
+#  ██████╗ ██╗   ██╗██╗
+# ██╔════╝ ██║   ██║██║
+# ██║  ███╗██║   ██║██║
+# ██║   ██║██║   ██║██║
+# ╚██████╔╝╚██████╔╝██║
+#  ╚═════╝  ╚═════╝ ╚═╝
+# GUI Settings
+gui:
+  # Enable or disable all GUI sounds
+  sounds-enabled: true
+
+# ██████╗ ███████╗██████╗ ██╗   ██╗ ██████╗ 
+# ██╔══██╗██╔════╝██╔══██╗██║   ██║██╔════╝ 
+# ██║  ██║█████╗  ██████╔╝██║   ██║██║  ███╗
+# ██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║
+# ██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝
+# ╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝ 
+# Debug Settings
+debug:
+  # Enable debug mode for troubleshooting
+  enabled: false
+
+# Update Checker
+update-checker:
+  # Check for updates on startup
+  enabled: true

@@ -1,0 +1,38 @@
+name: InvRewind
+version: '${version}'
+main: dev.mukulx.invrewind.InvRewind
+api-version: '1.21'
+folia-supported: true
+author: MukulX
+description: Highly configurable inventory backup and restore plugin for Paper, Purpur, and Folia.
+website: https://github.com/mukulx/invrewind
+
+libraries:
+  - com.zaxxer:HikariCP:6.3.3
+  - org.xerial:sqlite-jdbc:3.51.2.0
+
+commands:
+  invrewind:
+    description: Open inventory restoration GUI
+    usage: /invrewind [player|reload|forcebackup]
+    permission: invrewind.admin
+    aliases: [ir, invr, rewind]
+  invrewindforce:
+    description: Force backup inventory
+    usage: /invrewindforce <all|player>
+    permission: invrewind.admin
+    aliases: [irf, invrf]
+
+permissions:
+  invrewind.use:
+    description: Access to restore own inventory
+    default: op
+  invrewind.admin:
+    description: Admin access to all features
+    default: op
+  invrewind.restore.others:
+    description: Restore other players' inventories
+    default: op
+  invrewind.forcebackup:
+    description: Force backup inventories
+    default: op
