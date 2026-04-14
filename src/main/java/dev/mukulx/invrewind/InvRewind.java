@@ -63,6 +63,17 @@ public final class InvRewind extends JavaPlugin {
                 return;
             }
 
+            String configuredType = configManager.getConfig().getString("database.type", "yaml");
+            String actualType = databaseManager.getActualDatabaseType();
+            if (!configuredType.equalsIgnoreCase(actualType)) {
+                getLogger().warning("========================================");
+                getLogger().warning("DATABASE FALLBACK ACTIVE!");
+                getLogger().warning("Configured: " + configuredType.toUpperCase());
+                getLogger().warning("Using: " + actualType.toUpperCase());
+                getLogger().warning("Fix your database config and restart");
+                getLogger().warning("========================================");
+            }
+
             backupManager = new BackupManager(this, databaseManager, configManager);
             guiManager = new GUIManager(this, backupManager, messageManager, configManager);
             scheduledBackupManager = new ScheduledBackupManager(this, configManager, backupManager, messageManager);

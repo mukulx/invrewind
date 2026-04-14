@@ -36,6 +36,7 @@ public class DatabaseManager {
     private final InvRewind plugin;
     private final ConfigManager configManager;
     private HikariDataSource dataSource;
+    private String actualDbType;
 
     public DatabaseManager(@NotNull InvRewind plugin, @NotNull ConfigManager configManager) {
         this.plugin = plugin;
@@ -43,22 +44,21 @@ public class DatabaseManager {
     }
 
     public boolean initialize() {
+        FileConfiguration config = configManager.getConfig();
+        String dbType = config.getString("database.type", "yaml");
+        actualDbType = dbType;
+
+        if (dbType.equalsIgnoreCase("yaml")) {
+            plugin.getLogger().info("Using YAML file-based storage");
+            return initializeYaml();
+        }
+
         try {
-            FileConfiguration config = configManager.getConfig();
-            String dbType = config.getString("database.type", "yaml");
-
-            if (dbType.equalsIgnoreCase("yaml")) {
-                plugin.getLogger().info("Using YAML file-based storage");
-                return true;
-            }
-
             HikariConfig hikariConfig = new HikariConfig();
-
             hikariConfig.setConnectionTestQuery("SELECT 1");
 
             if (dbType.equalsIgnoreCase("mysql")) {
                 setupMySQL(hikariConfig, config);
-
                 hikariConfig.setMaximumPoolSize(10);
                 hikariConfig.setMinimumIdle(2);
                 hikariConfig.setConnectionTimeout(30000);
@@ -66,7 +66,6 @@ public class DatabaseManager {
                 hikariConfig.setMaxLifetime(1800000);
             } else {
                 setupSQLite(hikariConfig, config);
-
             }
 
             dataSource = new HikariDataSource(hikariConfig);
@@ -83,8 +82,31 @@ public class DatabaseManager {
             return true;
 
         } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Failed to initialize database!", e);
-            plugin.getLogger().severe("Plugin will be disabled to prevent data loss!");
+            plugin.getLogger().log(Level.SEVERE, "Failed to initialize " + dbType + " database!", e);
+            plugin.getLogger().warning("Falling back to YAML storage to prevent data loss");
+            plugin.getLogger().warning("Please fix your database configuration and restart the server");
+            
+            if (dataSource != null && !dataSource.isClosed()) {
+                dataSource.close();
+                dataSource = null;
+            }
+            
+            actualDbType = "yaml";
+            return initializeYaml();
+        }
+    }
+
+    private boolean initializeYaml() {
+        try {
+            File backupsFolder = new File(plugin.getDataFolder(), 
+                configManager.getConfig().getString("database.yaml.folder", "backups"));
+            if (!backupsFolder.exists()) {
+                backupsFolder.mkdirs();
+            }
+            plugin.getLogger().info("YAML backup storage initialized at: " + backupsFolder.getAbsolutePath());
+            return true;
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to initialize YAML storage!", e);
             return false;
         }
     }
@@ -239,8 +261,12 @@ public class DatabaseManager {
     }
 
     public boolean isYamlMode() {
-        String dbType = configManager.getConfig().getString("database.type", "yaml");
-        return dbType.equalsIgnoreCase("yaml");
+        return actualDbType != null && actualDbType.equalsIgnoreCase("yaml");
+    }
+
+    @NotNull
+    public String getActualDatabaseType() {
+        return actualDbType != null ? actualDbType : "yaml";
     }
 
     public void shutdown() {
