@@ -53,7 +53,7 @@ public class ExportCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             String currentType = plugin.getDatabaseManager().getActualDatabaseType();
-            sender.sendMessage("§eExporting current database (" + currentType + ")...");
+            sender.sendMessage("§eexporting current database (" + currentType + ")...");
             
             migrationManager.exportData(currentType).thenAccept(result -> {
                 sender.sendMessage(result);
@@ -65,11 +65,11 @@ public class ExportCommand implements CommandExecutor, TabCompleter {
             String targetType = args[0].toLowerCase();
             
             if (!targetType.equals("yaml") && !targetType.equals("sqlite") && !targetType.equals("mysql")) {
-                sender.sendMessage("§cInvalid export type. Use: yaml, sqlite, or mysql");
+                sender.sendMessage("§cinvalid export type. use: yaml, sqlite, or mysql");
                 return true;
             }
             
-            sender.sendMessage("§eExporting to " + targetType + " format...");
+            sender.sendMessage("§eexporting to " + targetType + " format...");
             
             migrationManager.exportData(targetType).thenAccept(result -> {
                 sender.sendMessage(result);
@@ -77,7 +77,7 @@ public class ExportCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        sender.sendMessage("§cUsage: /invrewind export [yaml|sqlite|mysql]");
+        sender.sendMessage("§cusage: /invrewind export [yaml|sqlite|mysql]");
         return true;
     }
 

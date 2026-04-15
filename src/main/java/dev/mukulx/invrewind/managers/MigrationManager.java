@@ -103,7 +103,7 @@ public class MigrationManager {
         List<BackupData> allBackups = getAllBackupsFromCurrentDb();
         
         if (allBackups.isEmpty()) {
-            return "§cNo backups found to export";
+            return "§cno backups found to export";
         }
         
         YamlDatabaseManager tempYaml = new YamlDatabaseManager(plugin);
@@ -158,7 +158,7 @@ public class MigrationManager {
             }
         }
         
-        return "§aExported " + count + " backups to: exports/yaml/export_" + timestamp;
+        return "§aexported " + count + " backups to: exports/yaml/export_" + timestamp;
     }
 
     private String exportToSqlite(String timestamp) throws Exception {
@@ -167,7 +167,7 @@ public class MigrationManager {
         List<BackupData> allBackups = getAllBackupsFromCurrentDb();
         
         if (allBackups.isEmpty()) {
-            return "§cNo backups found to export";
+            return "§cno backups found to export";
         }
         
         String url = "jdbc:sqlite:" + exportFile.getAbsolutePath();
@@ -226,7 +226,7 @@ public class MigrationManager {
                     }
                 }
                 
-                return "§aExported " + count + " backups to: exports/sqlite/export_" + timestamp + ".db";
+                return "§aexported " + count + " backups to: exports/sqlite/export_" + timestamp + ".db";
             }
         }
     }
@@ -237,7 +237,7 @@ public class MigrationManager {
         List<BackupData> allBackups = getAllBackupsFromCurrentDb();
         
         if (allBackups.isEmpty()) {
-            return "§cNo backups found to export";
+            return "§cno backups found to export";
         }
         
         try (FileWriter writer = new FileWriter(exportFile)) {
@@ -315,7 +315,7 @@ public class MigrationManager {
                 }
             }
             
-            return "§aExported " + count + " backups to: exports/mysql/export_" + timestamp + ".sql";
+            return "§aexported " + count + " backups to: exports/mysql/export_" + timestamp + ".sql";
         }
     }
 
@@ -594,7 +594,7 @@ public class MigrationManager {
         File importFolder = new File(importsFolder, "yaml/" + foldername);
         
         if (!importFolder.exists() || !importFolder.isDirectory()) {
-            return "§cImport folder not found: " + foldername;
+            return "§cimport folder not found: " + foldername;
         }
         
         List<BackupData> backups = new ArrayList<>();
@@ -622,7 +622,7 @@ public class MigrationManager {
         }
         
         if (backups.isEmpty()) {
-            return "§cNo backups found in import folder";
+            return "§cno backups found in import folder";
         }
         
         int imported = importBackupsToCurrentDb(backups);
@@ -631,14 +631,14 @@ public class MigrationManager {
             deleteDirectory(importFolder);
         }
         
-        return "§aImported " + imported + " backups from: " + foldername;
+        return "§aimported " + imported + " backups from: " + foldername;
     }
 
     private String importFromSqlite(String filename) throws Exception {
         File importFile = new File(importsFolder, "sqlite/" + filename);
         
         if (!importFile.exists()) {
-            return "§cImport file not found: " + filename;
+            return "§cimport file not found: " + filename;
         }
         
         String url = "jdbc:sqlite:" + importFile.getAbsolutePath();
@@ -657,7 +657,7 @@ public class MigrationManager {
         }
         
         if (backups.isEmpty()) {
-            return "§cNo backups found in import file";
+            return "§cno backups found in import file";
         }
         
         int imported = importBackupsToCurrentDb(backups);
@@ -666,51 +666,66 @@ public class MigrationManager {
             importFile.delete();
         }
         
-        return "§aImported " + imported + " backups from: " + filename;
+        return "§aimported " + imported + " backups from: " + filename;
     }
 
     private String importFromMysql(String filename) throws Exception {
         File importFile = new File(importsFolder, "mysql/" + filename);
         
         if (!importFile.exists()) {
-            return "§cImport file not found: " + filename;
+            return "§cimport file not found: " + filename;
         }
         
-        if (!databaseManager.isYamlMode()) {
-            String content = Files.readString(importFile.toPath());
+        String currentDbType = databaseManager.getActualDatabaseType();
+        
+        if (currentDbType.equalsIgnoreCase("yaml")) {
+            return "§ccannot import SQL file to YAML storage. please configure MySQL or SQLite database first.";
+        }
+        
+        if (!currentDbType.equalsIgnoreCase("mysql") && !currentDbType.equalsIgnoreCase("sqlite")) {
+            return "§ccurrent database type (" + currentDbType + ") does not support SQL import. please use MySQL or SQLite.";
+        }
+        
+        try (Connection conn = databaseManager.getConnection()) {
+            if (conn == null || conn.isClosed()) {
+                return "§cdatabase connection failed. please check your database configuration and ensure the database is accessible.";
+            }
+        } catch (SQLException e) {
+            return "§cdatabase connection failed: " + e.getMessage() + ". please verify your database settings.";
+        }
+        
+        String content = Files.readString(importFile.toPath());
+        
+        try (Connection conn = databaseManager.getConnection();
+             Statement stmt = conn.createStatement()) {
             
-            try (Connection conn = databaseManager.getConnection();
-                 Statement stmt = conn.createStatement()) {
-                
-                String[] statements = content.split(";");
-                int count = 0;
-                
-                for (String sql : statements) {
-                    sql = sql.trim();
-                    if (!sql.isEmpty() && !sql.startsWith("--")) {
-                        stmt.execute(sql);
-                        if (sql.toUpperCase().startsWith("INSERT")) {
-                            count++;
-                            if (count % 100 == 0) {
-                                plugin.getLogger().info("Imported " + count + " backups...");
-                            }
+            String[] statements = content.split(";");
+            int count = 0;
+            
+            for (String sql : statements) {
+                sql = sql.trim();
+                if (!sql.isEmpty() && !sql.startsWith("--")) {
+                    stmt.execute(sql);
+                    if (sql.toUpperCase().startsWith("INSERT")) {
+                        count++;
+                        if (count % 100 == 0) {
+                            plugin.getLogger().info("Imported " + count + " backups...");
                         }
                     }
                 }
-                
-                if (configManager.getConfig().getBoolean("migration.delete-source-after-import", false)) {
-                    importFile.delete();
-                }
-                
-                return "§aImported SQL file: " + filename;
             }
-        } else {
-            return "§cCannot import SQL file directly to YAML storage. Please use SQLite or MySQL database.";
+            
+            if (configManager.getConfig().getBoolean("migration.delete-source-after-import", false)) {
+                importFile.delete();
+            }
+            
+            return "§aimported SQL file: " + filename + " (" + count + " backups)";
         }
     }
 
     private int importBackupsToCurrentDb(List<BackupData> backups) throws Exception {
         int count = 0;
+        int skipped = 0;
         
         if (databaseManager.isYamlMode()) {
             YamlDatabaseManager yamlDb = new YamlDatabaseManager(plugin);
@@ -724,7 +739,8 @@ public class MigrationManager {
                 }
             }
         } else {
-            String sql = """
+            String checkSql = "SELECT COUNT(*) FROM invrewind_backups WHERE id = ?";
+            String insertSql = """
                 INSERT INTO invrewind_backups
                 (id, player_uuid, player_name, backup_type, timestamp, world, x, y, z, yaw, pitch,
                  health, hunger, xp_level, xp_progress, inventory_data, armor_data, offhand_data, enderchest_data)
@@ -732,42 +748,51 @@ public class MigrationManager {
                 """;
             
             try (Connection conn = databaseManager.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+                 PreparedStatement checkStmt = conn.prepareStatement(checkSql);
+                 PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
                 
                 for (BackupData backup : backups) {
-                    stmt.setInt(1, backup.getId());
-                    stmt.setString(2, backup.getPlayerUuid().toString());
-                    stmt.setString(3, backup.getPlayerName());
-                    stmt.setString(4, backup.getBackupType().getKey());
-                    stmt.setLong(5, backup.getTimestamp());
+                    checkStmt.setInt(1, backup.getId());
+                    try (ResultSet rs = checkStmt.executeQuery()) {
+                        if (rs.next() && rs.getInt(1) > 0) {
+                            skipped++;
+                            continue;
+                        }
+                    }
+                    
+                    insertStmt.setInt(1, backup.getId());
+                    insertStmt.setString(2, backup.getPlayerUuid().toString());
+                    insertStmt.setString(3, backup.getPlayerName());
+                    insertStmt.setString(4, backup.getBackupType().getKey());
+                    insertStmt.setLong(5, backup.getTimestamp());
                     
                     if (backup.getLocation() != null) {
                         Location loc = backup.getLocation();
-                        stmt.setString(6, loc.getWorld().getName());
-                        stmt.setDouble(7, loc.getX());
-                        stmt.setDouble(8, loc.getY());
-                        stmt.setDouble(9, loc.getZ());
-                        stmt.setFloat(10, loc.getYaw());
-                        stmt.setFloat(11, loc.getPitch());
+                        insertStmt.setString(6, loc.getWorld().getName());
+                        insertStmt.setDouble(7, loc.getX());
+                        insertStmt.setDouble(8, loc.getY());
+                        insertStmt.setDouble(9, loc.getZ());
+                        insertStmt.setFloat(10, loc.getYaw());
+                        insertStmt.setFloat(11, loc.getPitch());
                     } else {
-                        stmt.setNull(6, Types.VARCHAR);
-                        stmt.setNull(7, Types.DOUBLE);
-                        stmt.setNull(8, Types.DOUBLE);
-                        stmt.setNull(9, Types.DOUBLE);
-                        stmt.setNull(10, Types.FLOAT);
-                        stmt.setNull(11, Types.FLOAT);
+                        insertStmt.setNull(6, Types.VARCHAR);
+                        insertStmt.setNull(7, Types.DOUBLE);
+                        insertStmt.setNull(8, Types.DOUBLE);
+                        insertStmt.setNull(9, Types.DOUBLE);
+                        insertStmt.setNull(10, Types.FLOAT);
+                        insertStmt.setNull(11, Types.FLOAT);
                     }
                     
-                    stmt.setDouble(12, backup.getHealth());
-                    stmt.setInt(13, backup.getHunger());
-                    stmt.setInt(14, backup.getXpLevel());
-                    stmt.setFloat(15, backup.getXpProgress());
-                    stmt.setString(16, backup.getInventory() != null ? ItemSerializer.serializeItems(backup.getInventory()) : null);
-                    stmt.setString(17, backup.getArmor() != null ? ItemSerializer.serializeItems(backup.getArmor()) : null);
-                    stmt.setString(18, backup.getOffhand() != null ? ItemSerializer.serializeItem(backup.getOffhand()) : null);
-                    stmt.setString(19, backup.getEnderchest() != null ? ItemSerializer.serializeItems(backup.getEnderchest()) : null);
+                    insertStmt.setDouble(12, backup.getHealth());
+                    insertStmt.setInt(13, backup.getHunger());
+                    insertStmt.setInt(14, backup.getXpLevel());
+                    insertStmt.setFloat(15, backup.getXpProgress());
+                    insertStmt.setString(16, backup.getInventory() != null ? ItemSerializer.serializeItems(backup.getInventory()) : null);
+                    insertStmt.setString(17, backup.getArmor() != null ? ItemSerializer.serializeItems(backup.getArmor()) : null);
+                    insertStmt.setString(18, backup.getOffhand() != null ? ItemSerializer.serializeItem(backup.getOffhand()) : null);
+                    insertStmt.setString(19, backup.getEnderchest() != null ? ItemSerializer.serializeItems(backup.getEnderchest()) : null);
                     
-                    stmt.executeUpdate();
+                    insertStmt.executeUpdate();
                     count++;
                     
                     if (count % 100 == 0) {
@@ -775,6 +800,10 @@ public class MigrationManager {
                     }
                 }
             }
+        }
+        
+        if (skipped > 0) {
+            plugin.getLogger().info("Skipped " + skipped + " duplicate backups");
         }
         
         return count;

@@ -68,14 +68,29 @@ jobs:
             ## What's Changed
             
             ### New Features
-            - Added automatic database fallback system - plugin now falls back to YAML storage if MySQL/SQLite connection fails
-            - Plugin remains functional while admins fix database configuration issues
-            - Clear warning messages displayed when fallback is active
+            - **Database Migration System**: Export and import backups between YAML, SQLite, and MySQL formats
+            - Export current database to any format with `/invrewind export [type]`
+            - Import from any format with `/invrewind import <type> <filename>`
+            - Async processing with progress logging every 100 backups
+            - Tab completion shows available import files
+            - Automatic duplicate detection and skipping on import
+            
+            ### Improvements
+            - Database fallback system: Plugin falls back to YAML if MySQL/SQLite connection fails
+            - Clear warning messages when fallback is active
+            - Config auto-migration from v1 to v2 with backup
+            - All migration commands work from console
+            - Database connection validation before SQL imports
+            - Helpful error messages guide users to fix configuration issues
             
             ### Technical Details
-            - Database type tracking separated from configuration
-            - Graceful error handling for database initialization failures
-            - Config file remains unchanged during fallback mode
+            - Added MigrationManager for handling all export/import operations
+            - Export formats: YAML folders, SQLite .db files, MySQL .sql dumps
+            - Import folder structure: imports/yaml/, imports/sqlite/, imports/mysql/
+            - Config option: migration.delete-source-after-import (default: false)
+            - New permissions: invrewind.export, invrewind.import (OP only)
+            - Config version bumped to 2
+            - Full Folia and Paper compatibility maintained
             
             **Full Changelog**: https://github.com/${{ github.repository }}/commits/v${{ steps.get_version.outputs.VERSION }}
           files: build/libs/InvRewind-*.jar

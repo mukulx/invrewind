@@ -52,7 +52,7 @@ public class ImportCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length < 2) {
-            sender.sendMessage("§cUsage: /invrewind import <yaml|sqlite|mysql> <filename>");
+            sender.sendMessage("§cusage: /invrewind import <yaml|sqlite|mysql> <filename>");
             return true;
         }
 
@@ -60,12 +60,12 @@ public class ImportCommand implements CommandExecutor, TabCompleter {
         String filename = args[1];
 
         if (!sourceType.equals("yaml") && !sourceType.equals("sqlite") && !sourceType.equals("mysql")) {
-            sender.sendMessage("§cInvalid import type. Use: yaml, sqlite, or mysql");
+            sender.sendMessage("§cinvalid import type. use: yaml, sqlite, or mysql");
             return true;
         }
 
-        sender.sendMessage("§eImporting from " + sourceType + ": " + filename + "...");
-        sender.sendMessage("§eThis may take a while for large backups...");
+        sender.sendMessage("§eimporting from " + sourceType + ": " + filename + "...");
+        sender.sendMessage("§ethis may take a while for large backups...");
 
         migrationManager.importData(sourceType, filename).thenAccept(result -> {
             sender.sendMessage(result);
@@ -84,12 +84,21 @@ public class ImportCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 1) {
-            completions.add("yaml");
-            completions.add("sqlite");
-            completions.add("mysql");
+            String input = args[0].toLowerCase();
+            if ("yaml".startsWith(input)) completions.add("yaml");
+            if ("sqlite".startsWith(input)) completions.add("sqlite");
+            if ("mysql".startsWith(input)) completions.add("mysql");
         } else if (args.length == 2) {
             String type = args[0].toLowerCase();
-            completions.addAll(migrationManager.getAvailableImports(type));
+            if (type.equals("yaml") || type.equals("sqlite") || type.equals("mysql")) {
+                List<String> files = migrationManager.getAvailableImports(type);
+                String input = args[1].toLowerCase();
+                for (String file : files) {
+                    if (file.toLowerCase().startsWith(input)) {
+                        completions.add(file);
+                    }
+                }
+            }
         }
 
         return completions;
