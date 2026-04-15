@@ -14,7 +14,7 @@ libraries:
 commands:
   invrewind:
     description: Open inventory restoration GUI
-    usage: /invrewind [player|reload|forcebackup]
+    usage: /invrewind [player|reload|forcebackup|export|import]
     permission: invrewind.admin
     aliases: [ir, invr, rewind]
   invrewindforce:
@@ -35,4 +35,10 @@ permissions:
     default: op
   invrewind.forcebackup:
     description: Force backup inventories
+    default: op
+  invrewind.export:
+    description: Export backups to different formats
+    default: op
+  invrewind.import:
+    description: Import backups from different formats
     default: op

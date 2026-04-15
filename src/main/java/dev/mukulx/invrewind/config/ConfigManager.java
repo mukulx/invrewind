@@ -71,7 +71,7 @@ public class ConfigManager {
 
     private void checkConfigVersion() {
         int currentVersion = config.getInt("plugin.config-version", 0);
-        int requiredVersion = 1;
+        int requiredVersion = 2;
 
         if (currentVersion < requiredVersion) {
             plugin.getLogger().warning("Config version outdated! Backing up and creating new config...");
@@ -95,24 +95,27 @@ public class ConfigManager {
         File backupFile = new File(plugin.getDataFolder(), "config.yml.backup.v" + from + "." + System.currentTimeMillis());
 
         try {
-
-            FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(configFile);
-
             if (configFile.exists()) {
+                FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(configFile);
                 java.nio.file.Files.copy(configFile.toPath(), backupFile.toPath());
                 plugin.getLogger().info("Old config backed up to: " + backupFile.getName());
+                
+                configFile.delete();
             }
 
-            plugin.saveResource("config.yml", true);
+            plugin.saveResource("config.yml", false);
             plugin.reloadConfig();
             config = plugin.getConfig();
-
-            migrateConfigValues(oldConfig, config);
-
-            plugin.saveConfig();
+            
+            if (backupFile.exists()) {
+                FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(backupFile);
+                migrateConfigValues(oldConfig, config);
+                plugin.saveConfig();
+            }
 
             plugin.getLogger().info("Config migrated from v" + from + " to v" + to);
-            plugin.getLogger().info("Old values have been preserved and copied to the new config");
+            plugin.getLogger().info("Please review the new config and update your settings from backup if needed");
+            plugin.getLogger().info("Backup location: " + backupFile.getName());
 
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to migrate config!", e);

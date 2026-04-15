@@ -39,13 +39,18 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
     private final GUIManager guiManager;
     private final MessageManager messageManager;
     private final InvRewindForceCommand forceCommand;
+    private final ExportCommand exportCommand;
+    private final ImportCommand importCommand;
 
     public InvRewindCommand(@NotNull InvRewind plugin, @NotNull GUIManager guiManager,
-                            @NotNull MessageManager messageManager) {
+                            @NotNull MessageManager messageManager, @NotNull ExportCommand exportCommand,
+                            @NotNull ImportCommand importCommand) {
         this.plugin = plugin;
         this.guiManager = guiManager;
         this.messageManager = messageManager;
         this.forceCommand = new InvRewindForceCommand(plugin, plugin.getBackupManager(), messageManager);
+        this.exportCommand = exportCommand;
+        this.importCommand = importCommand;
     }
 
     @Override
@@ -110,6 +115,18 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
             return forceCommand.onCommand(sender, command, label, forceArgs);
         }
 
+        if (args.length >= 1 && args[0].equalsIgnoreCase("export")) {
+            String[] exportArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, exportArgs, 0, args.length - 1);
+            return exportCommand.onCommand(sender, command, label, exportArgs);
+        }
+
+        if (args.length >= 2 && args[0].equalsIgnoreCase("import")) {
+            String[] importArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, importArgs, 0, args.length - 1);
+            return importCommand.onCommand(sender, command, label, importArgs);
+        }
+
         messageManager.sendMessage(player, "commands.invrewind.usage");
         return true;
     }
@@ -128,6 +145,14 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
                 completions.add("forcebackup");
             }
 
+            if (sender.hasPermission("invrewind.export")) {
+                completions.add("export");
+            }
+
+            if (sender.hasPermission("invrewind.import")) {
+                completions.add("import");
+            }
+
             if (sender.hasPermission("invrewind.restore.others")) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     completions.add(player.getName());
@@ -138,6 +163,12 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 completions.add(player.getName());
             }
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("export")) {
+            return exportCommand.onTabComplete(sender, command, label, new String[]{args[1]});
+        } else if (args.length >= 2 && args[0].equalsIgnoreCase("import")) {
+            String[] importArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, importArgs, 0, args.length - 1);
+            return importCommand.onTabComplete(sender, command, label, importArgs);
         }
 
         return completions;

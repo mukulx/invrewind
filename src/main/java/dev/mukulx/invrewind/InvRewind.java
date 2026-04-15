@@ -17,6 +17,8 @@
  */
 package dev.mukulx.invrewind;
 
+import dev.mukulx.invrewind.commands.ExportCommand;
+import dev.mukulx.invrewind.commands.ImportCommand;
 import dev.mukulx.invrewind.commands.InvRewindCommand;
 import dev.mukulx.invrewind.commands.InvRewindForceCommand;
 import dev.mukulx.invrewind.config.ConfigManager;
@@ -26,6 +28,7 @@ import dev.mukulx.invrewind.listeners.BackupListener;
 import dev.mukulx.invrewind.listeners.GUIListener;
 import dev.mukulx.invrewind.managers.BackupManager;
 import dev.mukulx.invrewind.managers.MessageManager;
+import dev.mukulx.invrewind.managers.MigrationManager;
 import dev.mukulx.invrewind.managers.ScheduledBackupManager;
 import dev.mukulx.invrewind.util.SchedulerUtil;
 import dev.mukulx.invrewind.util.UpdateChecker;
@@ -45,6 +48,7 @@ public final class InvRewind extends JavaPlugin {
     private BackupManager backupManager;
     private GUIManager guiManager;
     private ScheduledBackupManager scheduledBackupManager;
+    private MigrationManager migrationManager;
 
     @Override
     public void onEnable() {
@@ -77,6 +81,7 @@ public final class InvRewind extends JavaPlugin {
             backupManager = new BackupManager(this, databaseManager, configManager);
             guiManager = new GUIManager(this, backupManager, messageManager, configManager);
             scheduledBackupManager = new ScheduledBackupManager(this, configManager, backupManager, messageManager);
+            migrationManager = new MigrationManager(this, databaseManager, configManager);
 
             registerCommands();
             registerListeners();
@@ -117,7 +122,10 @@ public final class InvRewind extends JavaPlugin {
     }
 
     private void registerCommands() {
-        InvRewindCommand invRewindCommand = new InvRewindCommand(this, guiManager, messageManager);
+        ExportCommand exportCommand = new ExportCommand(this, migrationManager, messageManager);
+        ImportCommand importCommand = new ImportCommand(this, migrationManager, messageManager);
+        
+        InvRewindCommand invRewindCommand = new InvRewindCommand(this, guiManager, messageManager, exportCommand, importCommand);
         getCommand("invrewind").setExecutor(invRewindCommand);
         getCommand("invrewind").setTabCompleter(invRewindCommand);
 
