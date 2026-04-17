@@ -17,7 +17,7 @@
 
 # Plugin Information & Core Settings
 plugin:
-  config-version: 2
+  config-version: 3
 
 # ██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗
 # ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝
@@ -276,3 +276,35 @@ migration:
   # Delete source file/folder after successful import
   # Disabled by default for safety
   delete-source-after-import: false
+
+#  ██████╗ ███████╗███████╗██╗     ██╗███╗   ██╗███████╗
+# ██╔═══██╗██╔════╝██╔════╝██║     ██║████╗  ██║██╔════╝
+# ██║   ██║█████╗  █████╗  ██║     ██║██╔██╗ ██║█████╗  
+# ██║   ██║██╔══╝  ██╔══╝  ██║     ██║██║╚██╗██║██╔══╝  
+# ╚██████╔╝██║     ██║     ███████╗██║██║ ╚████║███████╗
+#  ╚═════╝ ╚═╝     ╚═╝     ╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝
+# Offline Player Restore Settings
+offline-restore:
+  # Enable or disable offline restore feature completely
+  enabled: true
+  
+  # Time in hours before pending restore expires
+  expiry-hours: 24
+  
+  # How often to check for expired restores (in seconds)
+  expiry-check-interval: 3600
+  
+  # Delay in ticks before applying restore after player joins (20 ticks = 1 second)
+  apply-delay-ticks: 20
+  
+  # Freeze player during restore (prevent movement, inventory actions, item pickup/drop)
+  freeze-player: true
+  
+  # Title message shown during restore
+  title: '§6restoring inventory...'
+  subtitle: '§7please wait'
+  
+  # Title timing (in ticks, 20 ticks = 1 second)
+  title-fade-in: 10
+  title-stay: 40
+  title-fade-out: 10

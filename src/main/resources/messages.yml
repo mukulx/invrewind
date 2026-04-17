@@ -76,6 +76,7 @@ gui:
     teleport-location: '<gradient:#00FFFF:#00CCCC>ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʟᴏᴄᴀᴛɪᴏɴ</gradient>'
     export-shulker: '<gradient:#FFAA00:#FF8800>ᴇxᴘᴏʀᴛ ᴛᴏ sʜᴜʟᴋᴇʀ ʙᴏx</gradient>'
     overwrite-current: '<gradient:#FF6600:#FF4400>ᴏᴠᴇʀᴡʀɪᴛᴇ ᴄᴜʀʀᴇɴᴛ</gradient>'
+    schedule-offline-restore: '<gradient:#FFD700:#FFA500>sᴄʜᴇᴅᴜʟᴇ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ</gradient>'
     confirm: '<gradient:#00FF88:#00CCAA>ᴄᴏɴғɪʀᴍ</gradient>'
     cancel: '<gradient:#FF4444:#CC0000>ᴄᴀɴᴄᴇʟ</gradient>'
     force-backup: '<gradient:#FF00FF:#CC00CC>ғᴏʀᴄᴇ ʙᴀᴄᴋᴜᴘ</gradient>'

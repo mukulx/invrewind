@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class GUIListener implements Listener {
 
@@ -137,11 +138,9 @@ public class GUIListener implements Listener {
 
         if (clicked.getItemMeta() instanceof SkullMeta meta) {
             if (meta.getOwningPlayer() != null) {
-                Player target = Bukkit.getPlayer(meta.getOwningPlayer().getUniqueId());
-                if (target != null) {
-                    playSound(viewer, "click-player");
-                    guiManager.openBackupTypeGUI(viewer, target.getUniqueId());
-                }
+                UUID targetUuid = meta.getOwningPlayer().getUniqueId();
+                playSound(viewer, "click-player");
+                guiManager.openBackupTypeGUI(viewer, targetUuid);
             }
         }
     }
@@ -220,13 +219,19 @@ public class GUIListener implements Listener {
         BackupData backup = session.getCurrentBackup();
         Player target = Bukkit.getPlayer(session.getTargetUuid());
 
+        Material type = clicked.getType();
+
+        if (type == Material.CLOCK) {
+            playSound(viewer, "click-restore");
+            scheduleOfflineRestore(viewer, backup);
+            return;
+        }
+
         if (target == null || !target.isOnline()) {
             messageManager.sendMessage(viewer, "gui.messages.target-must-be-online");
             viewer.closeInventory();
             return;
         }
-
-        Material type = clicked.getType();
 
         if (slot == 45 && type == Material.EMERALD) {
             playSound(viewer, "click-restore");
@@ -570,6 +575,45 @@ public class GUIListener implements Listener {
         } else {
             messageManager.sendMessage(viewer, "gui.messages.no-location-data");
         }
+        viewer.closeInventory();
+    }
+
+    private void scheduleOfflineRestore(@NotNull Player viewer, @NotNull BackupData backup) {
+        FileConfiguration config = guiManager.getPlugin().getConfigManager().getConfig();
+
+        boolean restoreInventory = config.getBoolean("restore.full-restore.inventory", true);
+        boolean restoreArmor = config.getBoolean("restore.full-restore.armor", true);
+        boolean restoreOffhand = config.getBoolean("restore.full-restore.offhand", true);
+        boolean restoreEnderchest = config.getBoolean("restore.full-restore.enderchest", false);
+        boolean restoreHealth = config.getBoolean("restore.full-restore.health", true);
+        boolean restoreHunger = config.getBoolean("restore.full-restore.hunger", true);
+        boolean restoreXp = config.getBoolean("restore.full-restore.xp", true);
+        boolean restoreLocation = config.getBoolean("restore.full-restore.location", false);
+
+        boolean success = guiManager.getPlugin().getOfflineRestoreManager().schedulePendingRestore(
+            backup.getPlayerUuid(),
+            backup.getPlayerName(),
+            backup.getId(),
+            backup.getBackupType(),
+            viewer.getUniqueId().toString(),
+            restoreInventory,
+            restoreArmor,
+            restoreOffhand,
+            restoreEnderchest,
+            restoreHealth,
+            restoreHunger,
+            restoreXp,
+            restoreLocation
+        );
+
+        if (success) {
+            long expiryHours = config.getLong("offline-restore.expiry-hours", 24);
+            viewer.sendMessage("<gradient:#00FF88:#00CCAA>sᴄʜᴇᴅᴜʟᴇᴅ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + backup.getPlayerName() + "</gradient> <gradient:#00FF88:#00CCAA>(ᴇxᴘɪʀᴇs ɪɴ " + expiryHours + " ʜᴏᴜʀs)</gradient>");
+            viewer.sendMessage("<gradient:#AAAAAA:#888888>ᴛʜᴇ ʀᴇsᴛᴏʀᴇ ᴡɪʟʟ ʙᴇ ᴀᴘᴘʟɪᴇᴅ ᴡʜᴇɴ ᴛʜᴇʏ ɴᴇxᴛ ᴊᴏɪɴ ᴛʜᴇ sᴇʀᴠᴇʀ</gradient>");
+        } else {
+            viewer.sendMessage("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ sᴄʜᴇᴅᴜʟᴇ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ</gradient>");
+        }
+
         viewer.closeInventory();
     }
 

@@ -71,40 +71,55 @@ public class GUIManager {
         GUISession session = sessions.computeIfAbsent(viewer.getUniqueId(), k -> new GUISession(viewer.getUniqueId(), null));
         session.setCurrentPage(page);
 
-        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        backupManager.getAllPlayersWithBackups().thenAccept(allPlayers -> {
+            SchedulerUtil.runTask(plugin, () -> {
+                int itemsPerPage = 45;
+                int startIndex = page * itemsPerPage;
+                int endIndex = Math.min(startIndex + itemsPerPage, allPlayers.size());
 
-        int itemsPerPage = 45;
-        int startIndex = page * itemsPerPage;
-        int endIndex = Math.min(startIndex + itemsPerPage, players.size());
+                int slot = 0;
+                for (int i = startIndex; i < endIndex; i++) {
+                    var playerInfo = allPlayers.get(i);
+                    UUID uuid = playerInfo.getKey();
+                    String name = playerInfo.getValue();
 
-        int slot = 0;
-        for (int i = startIndex; i < endIndex; i++) {
-            Player player = players.get(i);
+                    ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+                    SkullMeta meta = (SkullMeta) skull.getItemMeta();
+                    if (meta != null) {
+                        meta.displayName(messageManager.toSmallCaps(name)
+                            .color(NamedTextColor.YELLOW));
+                        meta.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
+                        
+                        Player onlinePlayer = Bukkit.getPlayer(uuid);
+                        if (onlinePlayer != null && onlinePlayer.isOnline()) {
+                            meta.lore(Arrays.asList(
+                                messageManager.getMessage("gui.lore.click-to-view"),
+                                messageManager.toSmallCaps("status: online").color(NamedTextColor.GREEN)
+                            ));
+                        } else {
+                            meta.lore(Arrays.asList(
+                                messageManager.getMessage("gui.lore.click-to-view"),
+                                messageManager.toSmallCaps("status: offline").color(NamedTextColor.RED)
+                            ));
+                        }
+                        skull.setItemMeta(meta);
+                    }
 
-            ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
-            SkullMeta meta = (SkullMeta) skull.getItemMeta();
-            if (meta != null) {
-                meta.displayName(messageManager.toSmallCaps(player.getName())
-                    .color(NamedTextColor.YELLOW));
-                meta.setOwningPlayer(player);
-                meta.lore(Arrays.asList(messageManager.getMessage("gui.lore.click-to-view")));
-                skull.setItemMeta(meta);
-            }
+                    inv.setItem(slot++, skull);
+                }
 
-            inv.setItem(slot++, skull);
-        }
+                if (page > 0) {
+                    inv.setItem(45, createNavItem(Material.ARROW, "gui.previous-page"));
+                }
 
-        if (page > 0) {
-            inv.setItem(45, createNavItem(Material.ARROW, "gui.previous-page"));
-        }
+                if (endIndex < allPlayers.size()) {
+                    inv.setItem(53, createNavItem(Material.ARROW, "gui.next-page"));
+                }
 
-        if (endIndex < players.size()) {
-            inv.setItem(53, createNavItem(Material.ARROW, "gui.next-page"));
-        }
-
-        playSound(viewer, "open");
-
-        viewer.openInventory(inv);
+                playSound(viewer, "open");
+                viewer.openInventory(inv);
+            });
+        });
     }
 
     public void openBackupTypeGUI(@NotNull Player viewer, @NotNull UUID targetUuid) {
@@ -309,8 +324,14 @@ public class GUIManager {
                 inv.setItem(slot++, createActionItem(Material.ENDER_PEARL, "gui.buttons.teleport-location"));
             }
 
-            if (slot <= 51) {
+            if (slot <= 50) {
                 inv.setItem(slot++, createActionItem(Material.SHULKER_BOX, "gui.buttons.export-shulker"));
+            }
+
+            Player target = Bukkit.getPlayer(backup.getPlayerUuid());
+            boolean offlineRestoreEnabled = configManager.getConfig().getBoolean("offline-restore.enabled", true);
+            if (target != null && !target.isOnline() && offlineRestoreEnabled && slot <= 50) {
+                inv.setItem(slot++, createActionItem(Material.CLOCK, "gui.buttons.schedule-offline-restore"));
             }
 
             inv.setItem(52, createActionItem(Material.ORANGE_DYE, "gui.buttons.overwrite-current"));

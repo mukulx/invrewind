@@ -620,6 +620,73 @@ public class BackupManager {
         cache.remove(playerUuid);
     }
 
+    @NotNull
+    public CompletableFuture<List<Map.Entry<UUID, String>>> getAllPlayersWithBackups() {
+        CompletableFuture<List<Map.Entry<UUID, String>>> future = new CompletableFuture<>();
+
+        SchedulerUtil.runTaskAsynchronously(plugin, () -> {
+            try {
+                Map<UUID, String> playersMap = new java.util.LinkedHashMap<>();
+
+                if (isYamlMode()) {
+                    java.io.File backupsFolder = new java.io.File(plugin.getDataFolder(), "backups");
+                    if (backupsFolder.exists() && backupsFolder.isDirectory()) {
+                        for (java.io.File typeFolder : backupsFolder.listFiles()) {
+                            if (typeFolder.isDirectory()) {
+                                for (java.io.File playerFolder : typeFolder.listFiles()) {
+                                    if (playerFolder.isDirectory()) {
+                                        String folderName = playerFolder.getName();
+                                        int underscoreIndex = folderName.lastIndexOf('_');
+                                        if (underscoreIndex > 0) {
+                                            String uuidStr = folderName.substring(underscoreIndex + 1);
+                                            String playerName = folderName.substring(0, underscoreIndex);
+                                            try {
+                                                UUID uuid = UUID.fromString(uuidStr);
+                                                playersMap.putIfAbsent(uuid, playerName);
+                                            } catch (IllegalArgumentException ignored) {}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    String sql = "SELECT DISTINCT player_uuid, player_name FROM invrewind_backups ORDER BY player_name";
+                    try (Connection conn = databaseManager.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(sql);
+                         ResultSet rs = stmt.executeQuery()) {
+                        while (rs.next()) {
+                            UUID uuid = UUID.fromString(rs.getString("player_uuid"));
+                            String name = rs.getString("player_name");
+                            playersMap.put(uuid, name);
+                        }
+                    } catch (SQLException e) {
+                        plugin.getLogger().log(Level.SEVERE, "Failed to get all players with backups", e);
+                    }
+                }
+
+                List<Map.Entry<UUID, String>> sortedPlayers = new ArrayList<>(playersMap.entrySet());
+                sortedPlayers.sort((a, b) -> {
+                    Player playerA = Bukkit.getPlayer(a.getKey());
+                    Player playerB = Bukkit.getPlayer(b.getKey());
+                    boolean onlineA = playerA != null && playerA.isOnline();
+                    boolean onlineB = playerB != null && playerB.isOnline();
+                    
+                    if (onlineA && !onlineB) return -1;
+                    if (!onlineA && onlineB) return 1;
+                    return a.getValue().compareToIgnoreCase(b.getValue());
+                });
+
+                future.complete(sortedPlayers);
+            } catch (Exception e) {
+                plugin.getLogger().log(Level.SEVERE, "Unexpected error getting all players", e);
+                future.complete(new ArrayList<>());
+            }
+        });
+
+        return future;
+    }
+
     private boolean verifyBackupCreated(@NotNull UUID playerUuid, @NotNull BackupData.BackupType type) {
         try {
             String sql = "SELECT COUNT(*) FROM invrewind_backups WHERE player_uuid = ? AND backup_type = ? AND timestamp > ?";

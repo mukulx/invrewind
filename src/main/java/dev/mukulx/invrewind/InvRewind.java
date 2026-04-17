@@ -29,6 +29,7 @@ import dev.mukulx.invrewind.listeners.GUIListener;
 import dev.mukulx.invrewind.managers.BackupManager;
 import dev.mukulx.invrewind.managers.MessageManager;
 import dev.mukulx.invrewind.managers.MigrationManager;
+import dev.mukulx.invrewind.managers.OfflineRestoreManager;
 import dev.mukulx.invrewind.managers.ScheduledBackupManager;
 import dev.mukulx.invrewind.util.SchedulerUtil;
 import dev.mukulx.invrewind.util.UpdateChecker;
@@ -49,6 +50,7 @@ public final class InvRewind extends JavaPlugin {
     private GUIManager guiManager;
     private ScheduledBackupManager scheduledBackupManager;
     private MigrationManager migrationManager;
+    private OfflineRestoreManager offlineRestoreManager;
 
     @Override
     public void onEnable() {
@@ -71,10 +73,10 @@ public final class InvRewind extends JavaPlugin {
             String actualType = databaseManager.getActualDatabaseType();
             if (!configuredType.equalsIgnoreCase(actualType)) {
                 getLogger().warning("========================================");
-                getLogger().warning("DATABASE FALLBACK ACTIVE!");
-                getLogger().warning("Configured: " + configuredType.toUpperCase());
-                getLogger().warning("Using: " + actualType.toUpperCase());
-                getLogger().warning("Fix your database config and restart");
+                getLogger().warning("ᴅᴀᴛᴀʙᴀsᴇ ғᴀʟʟʙᴀᴄᴋ ᴀᴄᴛɪᴠᴇ!");
+                getLogger().warning("ᴄᴏɴғɪɢᴜʀᴇᴅ: " + configuredType.toUpperCase());
+                getLogger().warning("ᴜsɪɴɢ: " + actualType.toUpperCase());
+                getLogger().warning("ғɪx ʏᴏᴜʀ ᴅᴀᴛᴀʙᴀsᴇ ᴄᴏɴғɪɢ ᴀɴᴅ ʀᴇsᴛᴀʀᴛ");
                 getLogger().warning("========================================");
             }
 
@@ -82,6 +84,8 @@ public final class InvRewind extends JavaPlugin {
             guiManager = new GUIManager(this, backupManager, messageManager, configManager);
             scheduledBackupManager = new ScheduledBackupManager(this, configManager, backupManager, messageManager);
             migrationManager = new MigrationManager(this, databaseManager, configManager);
+            offlineRestoreManager = new OfflineRestoreManager(this, databaseManager, configManager);
+            offlineRestoreManager.initialize();
 
             registerCommands();
             registerListeners();
@@ -105,6 +109,10 @@ public final class InvRewind extends JavaPlugin {
         try {
             if (scheduledBackupManager != null) {
                 scheduledBackupManager.stop();
+            }
+
+            if (offlineRestoreManager != null) {
+                offlineRestoreManager.shutdown();
             }
 
             if (databaseManager != null) {
@@ -137,6 +145,7 @@ public final class InvRewind extends JavaPlugin {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new BackupListener(this, backupManager, configManager, scheduledBackupManager), this);
         getServer().getPluginManager().registerEvents(new GUIListener(guiManager), this);
+        getServer().getPluginManager().registerEvents(new dev.mukulx.invrewind.listeners.OfflineRestoreListener(this, offlineRestoreManager, backupManager, configManager), this);
     }
 
     private void initializeMetrics() {
@@ -195,6 +204,11 @@ public final class InvRewind extends JavaPlugin {
     @NotNull
     public ScheduledBackupManager getScheduledBackupManager() {
         return scheduledBackupManager;
+    }
+
+    @NotNull
+    public OfflineRestoreManager getOfflineRestoreManager() {
+        return offlineRestoreManager;
     }
 
     private void displayStartupLogo() {

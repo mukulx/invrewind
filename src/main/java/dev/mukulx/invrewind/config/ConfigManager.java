@@ -71,7 +71,7 @@ public class ConfigManager {
 
     private void checkConfigVersion() {
         int currentVersion = config.getInt("plugin.config-version", 0);
-        int requiredVersion = 2;
+        int requiredVersion = 3;
 
         if (currentVersion < requiredVersion) {
             plugin.getLogger().warning("Config version outdated! Backing up and creating new config...");
@@ -377,6 +377,45 @@ public class ConfigManager {
 
         if (oldConfig.contains("debug.enabled")) {
             newConfig.set("debug.enabled", oldConfig.getBoolean("debug.enabled"));
+        }
+
+        if (oldConfig.contains("update-checker.enabled")) {
+            newConfig.set("update-checker.enabled", oldConfig.getBoolean("update-checker.enabled"));
+        }
+
+        if (oldConfig.contains("migration.delete-source-after-import")) {
+            newConfig.set("migration.delete-source-after-import", oldConfig.getBoolean("migration.delete-source-after-import"));
+        }
+
+        if (oldConfig.contains("offline-restore.enabled")) {
+            newConfig.set("offline-restore.enabled", oldConfig.getBoolean("offline-restore.enabled"));
+        }
+        if (oldConfig.contains("offline-restore.expiry-hours")) {
+            newConfig.set("offline-restore.expiry-hours", oldConfig.getLong("offline-restore.expiry-hours"));
+        }
+        if (oldConfig.contains("offline-restore.expiry-check-interval")) {
+            newConfig.set("offline-restore.expiry-check-interval", oldConfig.getLong("offline-restore.expiry-check-interval"));
+        }
+        if (oldConfig.contains("offline-restore.apply-delay-ticks")) {
+            newConfig.set("offline-restore.apply-delay-ticks", oldConfig.getLong("offline-restore.apply-delay-ticks"));
+        }
+        if (oldConfig.contains("offline-restore.freeze-player")) {
+            newConfig.set("offline-restore.freeze-player", oldConfig.getBoolean("offline-restore.freeze-player"));
+        }
+        if (oldConfig.contains("offline-restore.title")) {
+            newConfig.set("offline-restore.title", oldConfig.getString("offline-restore.title"));
+        }
+        if (oldConfig.contains("offline-restore.subtitle")) {
+            newConfig.set("offline-restore.subtitle", oldConfig.getString("offline-restore.subtitle"));
+        }
+        if (oldConfig.contains("offline-restore.title-fade-in")) {
+            newConfig.set("offline-restore.title-fade-in", oldConfig.getInt("offline-restore.title-fade-in"));
+        }
+        if (oldConfig.contains("offline-restore.title-stay")) {
+            newConfig.set("offline-restore.title-stay", oldConfig.getInt("offline-restore.title-stay"));
+        }
+        if (oldConfig.contains("offline-restore.title-fade-out")) {
+            newConfig.set("offline-restore.title-fade-out", oldConfig.getInt("offline-restore.title-fade-out"));
         }
 
         plugin.getLogger().info("Migrated " + countMigratedValues(oldConfig, newConfig) + " settings from old config");

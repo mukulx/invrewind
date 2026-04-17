@@ -97,14 +97,25 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
             }
 
             Player target = Bukkit.getPlayer(args[0]);
-            if (target == null) {
-                messageManager.sendMessage(player, "general.player-not-found",
-                    Map.of("player", args[0]));
+            if (target != null) {
+                guiManager.openBackupTypeGUI(player, target.getUniqueId());
+                messageManager.sendMessage(player, "commands.invrewind.opening-gui");
                 return true;
             }
 
-            guiManager.openBackupTypeGUI(player, target.getUniqueId());
-            messageManager.sendMessage(player, "commands.invrewind.opening-gui");
+            plugin.getBackupManager().getAllPlayersWithBackups().thenAccept(players -> {
+                for (var entry : players) {
+                    if (entry.getValue().equalsIgnoreCase(args[0])) {
+                        guiManager.openBackupTypeGUI(player, entry.getKey());
+                        messageManager.sendMessage(player, "commands.invrewind.opening-gui");
+                        return;
+                    }
+                }
+                
+                messageManager.sendMessage(player, "general.player-not-found",
+                    Map.of("player", args[0]));
+            });
+            
             return true;
         }
 
@@ -154,8 +165,16 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
             }
 
             if (sender.hasPermission("invrewind.restore.others")) {
+                plugin.getBackupManager().getAllPlayersWithBackups().thenAccept(players -> {
+                    for (var entry : players) {
+                        completions.add(entry.getValue());
+                    }
+                });
+                
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    completions.add(player.getName());
+                    if (!completions.contains(player.getName())) {
+                        completions.add(player.getName());
+                    }
                 }
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("forcebackup")) {
