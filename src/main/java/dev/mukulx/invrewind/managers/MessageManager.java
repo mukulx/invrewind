@@ -40,6 +40,19 @@ public class MessageManager {
         this.miniMessage = MiniMessage.miniMessage();
     }
 
+    @NotNull
+    public Component toSmallCaps(@NotNull String text) {
+        String smallCaps = text.toLowerCase()
+            .replace("a", "ᴀ").replace("b", "ʙ").replace("c", "ᴄ").replace("d", "ᴅ")
+            .replace("e", "ᴇ").replace("f", "ғ").replace("g", "ɢ").replace("h", "ʜ")
+            .replace("i", "ɪ").replace("j", "ᴊ").replace("k", "ᴋ").replace("l", "ʟ")
+            .replace("m", "ᴍ").replace("n", "ɴ").replace("o", "ᴏ").replace("p", "ᴘ")
+            .replace("q", "ǫ").replace("r", "ʀ").replace("s", "s").replace("t", "ᴛ")
+            .replace("u", "ᴜ").replace("v", "ᴠ").replace("w", "ᴡ").replace("x", "x")
+            .replace("y", "ʏ").replace("z", "ᴢ");
+        return Component.text(smallCaps);
+    }
+
     public void sendMessage(@NotNull CommandSender sender, @NotNull String path) {
         sendMessage(sender, path, null);
     }
