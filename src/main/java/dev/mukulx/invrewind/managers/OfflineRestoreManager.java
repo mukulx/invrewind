@@ -100,6 +100,7 @@ public class OfflineRestoreManager {
                         restore_hunger BOOLEAN NOT NULL,
                         restore_xp BOOLEAN NOT NULL,
                         restore_location BOOLEAN NOT NULL,
+                        overwrite BOOLEAN NOT NULL DEFAULT FALSE,
                         INDEX idx_player_uuid (player_uuid),
                         INDEX idx_expiry_time (expiry_time)
                     )
@@ -122,13 +123,28 @@ public class OfflineRestoreManager {
                         restore_health INTEGER NOT NULL,
                         restore_hunger INTEGER NOT NULL,
                         restore_xp INTEGER NOT NULL,
-                        restore_location INTEGER NOT NULL
+                        restore_location INTEGER NOT NULL,
+                        overwrite INTEGER NOT NULL DEFAULT 0
                     )
                     """;
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.execute();
+            }
+
+            try {
+                String alterSql;
+                if (configManager.getConfig().getString("database.type", "sqlite").equalsIgnoreCase("mysql")) {
+                    alterSql = "ALTER TABLE invrewind_pending_restores ADD COLUMN IF NOT EXISTS overwrite BOOLEAN NOT NULL DEFAULT FALSE";
+                } else {
+                    alterSql = "ALTER TABLE invrewind_pending_restores ADD COLUMN overwrite INTEGER NOT NULL DEFAULT 0";
+                }
+                try (PreparedStatement alterStmt = conn.prepareStatement(alterSql)) {
+                    alterStmt.execute();
+                } catch (SQLException e) {
+                }
+            } catch (Exception e) {
             }
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to initialize pending restores table", e);
@@ -174,11 +190,12 @@ public class OfflineRestoreManager {
                 boolean restoreHunger = yaml.getBoolean("restore-hunger");
                 boolean restoreXp = yaml.getBoolean("restore-xp");
                 boolean restoreLocation = yaml.getBoolean("restore-location");
+                boolean overwrite = yaml.getBoolean("overwrite", false);
 
                 PendingRestore pending = new PendingRestore(
                     0, playerUuid, playerName, backupId, backupType, scheduledTime, expiryTime,
                     scheduledBy, restoreInventory, restoreArmor, restoreOffhand, restoreEnderchest,
-                    restoreHealth, restoreHunger, restoreXp, restoreLocation
+                    restoreHealth, restoreHunger, restoreXp, restoreLocation, overwrite
                 );
 
                 pendingRestores.put(playerUuid, pending);
@@ -213,11 +230,17 @@ public class OfflineRestoreManager {
                 boolean restoreHunger = rs.getBoolean("restore_hunger");
                 boolean restoreXp = rs.getBoolean("restore_xp");
                 boolean restoreLocation = rs.getBoolean("restore_location");
+                
+                boolean overwrite = false;
+                try {
+                    overwrite = rs.getBoolean("overwrite");
+                } catch (SQLException e) {
+                }
 
                 PendingRestore pending = new PendingRestore(
                     id, playerUuid, playerName, backupId, backupType, scheduledTime, expiryTime,
                     scheduledBy, restoreInventory, restoreArmor, restoreOffhand, restoreEnderchest,
-                    restoreHealth, restoreHunger, restoreXp, restoreLocation
+                    restoreHealth, restoreHunger, restoreXp, restoreLocation, overwrite
                 );
 
                 pendingRestores.put(playerUuid, pending);
@@ -232,7 +255,7 @@ public class OfflineRestoreManager {
                                          @NotNull String scheduledBy, boolean restoreInventory,
                                          boolean restoreArmor, boolean restoreOffhand, boolean restoreEnderchest,
                                          boolean restoreHealth, boolean restoreHunger, boolean restoreXp,
-                                         boolean restoreLocation) {
+                                         boolean restoreLocation, boolean overwrite) {
 
         long scheduledTime = System.currentTimeMillis();
         long expiryHours = configManager.getConfig().getLong("offline-restore.expiry-hours", 24);
@@ -241,7 +264,7 @@ public class OfflineRestoreManager {
         PendingRestore pending = new PendingRestore(
             0, playerUuid, playerName, backupId, backupType, scheduledTime, expiryTime,
             scheduledBy, restoreInventory, restoreArmor, restoreOffhand, restoreEnderchest,
-            restoreHealth, restoreHunger, restoreXp, restoreLocation
+            restoreHealth, restoreHunger, restoreXp, restoreLocation, overwrite
         );
 
         if (databaseManager.isYamlMode()) {
@@ -275,6 +298,7 @@ public class OfflineRestoreManager {
         yaml.set("restore-hunger", pending.isRestoreHunger());
         yaml.set("restore-xp", pending.isRestoreXp());
         yaml.set("restore-location", pending.isRestoreLocation());
+        yaml.set("overwrite", pending.isOverwrite());
 
         try {
             yaml.save(file);
@@ -292,8 +316,8 @@ public class OfflineRestoreManager {
             INSERT INTO invrewind_pending_restores
             (player_uuid, player_name, backup_id, backup_type, scheduled_time, expiry_time, scheduled_by,
              restore_inventory, restore_armor, restore_offhand, restore_enderchest,
-             restore_health, restore_hunger, restore_xp, restore_location)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             restore_health, restore_hunger, restore_xp, restore_location, overwrite)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
         try (Connection conn = databaseManager.getConnection()) {
@@ -318,6 +342,7 @@ public class OfflineRestoreManager {
                 insertStmt.setBoolean(13, pending.isRestoreHunger());
                 insertStmt.setBoolean(14, pending.isRestoreXp());
                 insertStmt.setBoolean(15, pending.isRestoreLocation());
+                insertStmt.setBoolean(16, pending.isOverwrite());
                 insertStmt.executeUpdate();
             }
 

@@ -221,13 +221,21 @@ public class GUIListener implements Listener {
 
         Material type = clicked.getType();
 
-        if (type == Material.CLOCK) {
-            playSound(viewer, "click-restore");
-            scheduleOfflineRestore(viewer, backup);
-            return;
-        }
-
         if (target == null || !target.isOnline()) {
+            boolean offlineRestoreEnabled = guiManager.getPlugin().getConfigManager().getConfig().getBoolean("offline-restore.enabled", true);
+            
+            if (offlineRestoreEnabled && type != Material.SHULKER_BOX && type != Material.ENDER_PEARL) {
+                if (type == Material.EMERALD) {
+                    playSound(viewer, "click-restore");
+                    scheduleOfflineRestore(viewer, backup, false);
+                    return;
+                } else if (type == Material.ORANGE_DYE) {
+                    playSound(viewer, "click-restore");
+                    scheduleOfflineRestore(viewer, backup, true);
+                    return;
+                }
+            }
+            
             messageManager.sendMessage(viewer, "gui.messages.target-must-be-online");
             viewer.closeInventory();
             return;
@@ -485,7 +493,7 @@ public class GUIListener implements Listener {
             RestoreUtil.teleportToLocation(target, backup);
         }
 
-        messageManager.sendMessage(viewer, "gui.messages.full-restored");
+        messageManager.sendMessage(viewer, "restore.success");
         viewer.closeInventory();
     }
 
@@ -498,7 +506,7 @@ public class GUIListener implements Listener {
         FileConfiguration config = guiManager.getPlugin().getConfigManager().getConfig();
 
         if (config.getBoolean("restore.full-restore.inventory", true)) {
-            RestoreUtil.restoreInventory(target, backup);
+            RestoreUtil.addInventoryItems(target, backup);
         }
         if (config.getBoolean("restore.full-restore.armor", true)) {
             RestoreUtil.restoreArmor(target, backup);
@@ -522,7 +530,7 @@ public class GUIListener implements Listener {
             RestoreUtil.teleportToLocation(target, backup);
         }
 
-        messageManager.sendMessage(viewer, "gui.messages.full-restored");
+        messageManager.sendMessage(viewer, "restore.success");
         viewer.closeInventory();
     }
 
@@ -578,7 +586,7 @@ public class GUIListener implements Listener {
         viewer.closeInventory();
     }
 
-    private void scheduleOfflineRestore(@NotNull Player viewer, @NotNull BackupData backup) {
+    private void scheduleOfflineRestore(@NotNull Player viewer, @NotNull BackupData backup, boolean overwrite) {
         FileConfiguration config = guiManager.getPlugin().getConfigManager().getConfig();
 
         boolean restoreInventory = config.getBoolean("restore.full-restore.inventory", true);
@@ -603,15 +611,17 @@ public class GUIListener implements Listener {
             restoreHealth,
             restoreHunger,
             restoreXp,
-            restoreLocation
+            restoreLocation,
+            overwrite
         );
 
         if (success) {
             long expiryHours = config.getLong("offline-restore.expiry-hours", 24);
-            viewer.sendMessage("<gradient:#00FF88:#00CCAA>sᴄʜᴇᴅᴜʟᴇᴅ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + backup.getPlayerName() + "</gradient> <gradient:#00FF88:#00CCAA>(ᴇxᴘɪʀᴇs ɪɴ " + expiryHours + " ʜᴏᴜʀs)</gradient>");
-            viewer.sendMessage("<gradient:#AAAAAA:#888888>ᴛʜᴇ ʀᴇsᴛᴏʀᴇ ᴡɪʟʟ ʙᴇ ᴀᴘᴘʟɪᴇᴅ ᴡʜᴇɴ ᴛʜᴇʏ ɴᴇxᴛ ᴊᴏɪɴ ᴛʜᴇ sᴇʀᴠᴇʀ</gradient>");
+            messageManager.sendMessage(viewer, "gui.messages.offline-restore-scheduled",
+                Map.of("player", backup.getPlayerName(), "hours", String.valueOf(expiryHours)));
+            messageManager.sendMessage(viewer, "gui.messages.offline-restore-info");
         } else {
-            viewer.sendMessage("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ sᴄʜᴇᴅᴜʟᴇ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ</gradient>");
+            messageManager.sendMessage(viewer, "gui.messages.offline-restore-failed");
         }
 
         viewer.closeInventory();

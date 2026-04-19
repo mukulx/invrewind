@@ -32,6 +32,22 @@ public class RestoreUtil {
         }
     }
 
+    public static void addInventoryItems(@NotNull Player player, @NotNull BackupData backup) {
+        ItemStack[] inventory = backup.getInventory();
+        if (inventory != null) {
+            for (ItemStack item : inventory) {
+                if (item != null && item.getType() != org.bukkit.Material.AIR) {
+                    java.util.HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(item.clone());
+                    if (!leftover.isEmpty()) {
+                        for (ItemStack drop : leftover.values()) {
+                            player.getWorld().dropItemNaturally(player.getLocation(), drop);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void restoreArmor(@NotNull Player player, @NotNull BackupData backup) {
         ItemStack[] armor = backup.getArmor();
         if (armor != null) {

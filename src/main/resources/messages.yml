@@ -62,7 +62,7 @@ gui:
   close: '<gradient:#FF4444:#CC0000>ᴄʟᴏsᴇ</gradient>'
   
   buttons:
-    restore-full: '<gradient:#00FF88:#00CCAA>ʀᴇsᴛᴏʀᴇ ғᴜʟʟ ʙᴀᴄᴋᴜᴘ</gradient>'
+    restore-full: '<gradient:#00FF88:#00CCAA>ᴀᴅᴅ ʙᴀᴄᴋᴜᴘ ɪᴛᴇᴍs</gradient>'
     restore-inventory: '<gradient:#00FF88:#00CCAA>ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ</gradient>'
     restore-inventory-only: '<gradient:#8B4513:#654321>ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ ᴏɴʟʏ</gradient>'
     restore-armor-only: '<gradient:#4169E1:#1E90FF>ʀᴇsᴛᴏʀᴇ ᴀʀᴍᴏʀ ᴏɴʟʏ</gradient>'
@@ -75,7 +75,7 @@ gui:
     view-enderchest: '<gradient:#AA00FF:#8800CC>ᴠɪᴇᴡ ᴇɴᴅᴇʀ ᴄʜᴇsᴛ</gradient>'
     teleport-location: '<gradient:#00FFFF:#00CCCC>ᴛᴇʟᴇᴘᴏʀᴛ ᴛᴏ ʟᴏᴄᴀᴛɪᴏɴ</gradient>'
     export-shulker: '<gradient:#FFAA00:#FF8800>ᴇxᴘᴏʀᴛ ᴛᴏ sʜᴜʟᴋᴇʀ ʙᴏx</gradient>'
-    overwrite-current: '<gradient:#FF6600:#FF4400>ᴏᴠᴇʀᴡʀɪᴛᴇ ᴄᴜʀʀᴇɴᴛ</gradient>'
+    overwrite-current: '<gradient:#FF6600:#FF4400>ᴏᴠᴇʀᴡʀɪᴛᴇ ɪɴᴠᴇɴᴛᴏʀʏ</gradient>'
     schedule-offline-restore: '<gradient:#FFD700:#FFA500>sᴄʜᴇᴅᴜʟᴇ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ</gradient>'
     confirm: '<gradient:#00FF88:#00CCAA>ᴄᴏɴғɪʀᴍ</gradient>'
     cancel: '<gradient:#FF4444:#CC0000>ᴄᴀɴᴄᴇʟ</gradient>'
@@ -94,9 +94,16 @@ gui:
     click-to-restore: '<gradient:#00FF88:#00CCAA>ᴄʟɪᴄᴋ ᴛᴏ ʀᴇsᴛᴏʀᴇ</gradient>'
     click-to-teleport: '<gradient:#00FFFF:#00CCCC>ᴄʟɪᴄᴋ ᴛᴏ ᴛᴇʟᴇᴘᴏʀᴛ</gradient>'
     click-to-backup: '<gradient:#FF00FF:#CC00CC>ᴄʟɪᴄᴋ ᴛᴏ ғᴏʀᴄᴇ ʙᴀᴄᴋᴜᴘ</gradient>'
+    add-items-info: '<gray>ᴋᴇᴇᴘs ᴄᴜʀʀᴇɴᴛ ɪᴛᴇᴍs ᴀɴᴅ ᴀᴅᴅs ʙᴀᴄᴋᴜᴘ ɪᴛᴇᴍs</gray>'
+    add-items-overflow: '<gray>ᴇxᴄᴇss ɪᴛᴇᴍs ᴡɪʟʟ ᴅʀᴏᴘ ɪғ ɪɴᴠᴇɴᴛᴏʀʏ ɪs ғᴜʟʟ</gray>'
+    overwrite-info: '<gray>ᴄʟᴇᴀʀs ɪɴᴠᴇɴᴛᴏʀʏ ᴀɴᴅ ʀᴇsᴛᴏʀᴇs ʙᴀᴄᴋᴜᴘ</gray>'
   
   messages:
     target-must-be-online: '{prefix}<gradient:#FF4444:#CC0000>ᴛᴀʀɢᴇᴛ ᴘʟᴀʏᴇʀ ᴍᴜsᴛ ʙᴇ ᴏɴʟɪɴᴇ!</gradient>'
+    player-offline: '{prefix}<gradient:#FFAA00:#FF8800>ᴘʟᴀʏᴇʀ ɪs ᴏғғʟɪɴᴇ.</gradient> <gradient:#00FF88:#00CCAA>ᴜsᴇ ᴛʜᴇ ᴄʟᴏᴄᴋ ʙᴜᴛᴛᴏɴ ᴛᴏ sᴄʜᴇᴅᴜʟᴇ ᴀ ʀᴇsᴛᴏʀᴇ.</gradient>'
+    offline-restore-scheduled: '{prefix}<gradient:#00FF88:#00CCAA>sᴄʜᴇᴅᴜʟᴇᴅ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>{player}</gradient> <gradient:#00FF88:#00CCAA>(ᴇxᴘɪʀᴇs ɪɴ {hours} ʜᴏᴜʀs)</gradient>'
+    offline-restore-info: '{prefix}<gradient:#AAAAAA:#888888>ᴛʜᴇ ʀᴇsᴛᴏʀᴇ ᴡɪʟʟ ʙᴇ ᴀᴘᴘʟɪᴇᴅ ᴡʜᴇɴ ᴛʜᴇʏ ɴᴇxᴛ ᴊᴏɪɴ ᴛʜᴇ sᴇʀᴠᴇʀ</gradient>'
+    offline-restore-failed: '{prefix}<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ sᴄʜᴇᴅᴜʟᴇ ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ</gradient>'
     inventory-restored: '{prefix}<gradient:#00FF88:#00CCAA>ɪɴᴠᴇɴᴛᴏʀʏ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
     armor-restored: '{prefix}<gradient:#00FF88:#00CCAA>ᴀʀᴍᴏʀ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'
     offhand-restored: '{prefix}<gradient:#00FF88:#00CCAA>ᴏғғʜᴀɴᴅ ʀᴇsᴛᴏʀᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ!</gradient>'

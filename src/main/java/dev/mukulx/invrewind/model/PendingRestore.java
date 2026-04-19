@@ -39,13 +39,14 @@ public class PendingRestore {
     private final boolean restoreHunger;
     private final boolean restoreXp;
     private final boolean restoreLocation;
+    private final boolean overwrite;
 
     public PendingRestore(int id, @NotNull UUID playerUuid, @NotNull String playerName,
                          int backupId, @NotNull BackupData.BackupType backupType,
                          long scheduledTime, long expiryTime, @NotNull String scheduledBy,
                          boolean restoreInventory, boolean restoreArmor, boolean restoreOffhand,
                          boolean restoreEnderchest, boolean restoreHealth, boolean restoreHunger,
-                         boolean restoreXp, boolean restoreLocation) {
+                         boolean restoreXp, boolean restoreLocation, boolean overwrite) {
         this.id = id;
         this.playerUuid = playerUuid;
         this.playerName = playerName;
@@ -62,6 +63,7 @@ public class PendingRestore {
         this.restoreHunger = restoreHunger;
         this.restoreXp = restoreXp;
         this.restoreLocation = restoreLocation;
+        this.overwrite = overwrite;
     }
 
     public int getId() {
@@ -130,6 +132,10 @@ public class PendingRestore {
 
     public boolean isRestoreLocation() {
         return restoreLocation;
+    }
+
+    public boolean isOverwrite() {
+        return overwrite;
     }
 
     public boolean isExpired() {

@@ -301,8 +301,8 @@ offline-restore:
   freeze-player: true
   
   # Title message shown during restore
-  title: '§6restoring inventory...'
-  subtitle: '§7please wait'
+  title: '<gradient:#FFAA00:#FF8800>ʀᴇsᴛᴏʀɪɴɢ ɪɴᴠᴇɴᴛᴏʀʏ...</gradient>'
+  subtitle: '<gradient:#AAAAAA:#888888>ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ</gradient>'
   
   # Title timing (in ticks, 20 ticks = 1 second)
   title-fade-in: 10

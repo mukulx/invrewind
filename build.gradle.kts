@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.mukulx"
-version = "1.3.0"
+version = "1.3.2"
 
 repositories {
     mavenCentral()
@@ -24,6 +24,8 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:6.3.3")
     compileOnly("org.xerial:sqlite-jdbc:3.51.2.0")
     implementation("org.bstats:bstats-bukkit:3.2.1")
+    implementation("net.kyori:adventure-api:4.17.0")
+    implementation("net.kyori:adventure-text-minimessage:4.17.0")
 }
 
 val targetJavaVersion = 21
@@ -55,12 +57,19 @@ tasks.processResources {
 
 tasks.shadowJar {
     dependencies {
-        exclude {
-            it.moduleGroup != "org.bstats"
-        }
+        include(dependency("org.bstats:bstats-bukkit:.*"))
+        include(dependency("net.kyori:adventure-api:.*"))
+        include(dependency("net.kyori:adventure-text-minimessage:.*"))
+        include(dependency("net.kyori:adventure-key:.*"))
+        include(dependency("net.kyori:examination-api:.*"))
+        include(dependency("net.kyori:examination-string:.*"))
+        include(dependency("net.kyori:adventure-text-serializer-gson:.*"))
+        include(dependency("net.kyori:adventure-text-serializer-json:.*"))
+        include(dependency("net.kyori:adventure-text-serializer-legacy:.*"))
     }
     
     relocate("org.bstats", "dev.mukulx.invrewind.bstats")
+    relocate("net.kyori", "dev.mukulx.invrewind.libs.kyori")
     
     archiveClassifier.set("")
 }

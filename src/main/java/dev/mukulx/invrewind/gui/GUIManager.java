@@ -64,15 +64,14 @@ public class GUIManager {
     }
 
     public void openPlayerSelectGUI(@NotNull Player viewer, int page) {
-        Component title = messageManager.getMessage("gui.titles.select-player");
-
-        Inventory inv = Bukkit.createInventory(new GUIHolder(GUIType.PLAYER_SELECT), 54, title);
-
         GUISession session = sessions.computeIfAbsent(viewer.getUniqueId(), k -> new GUISession(viewer.getUniqueId(), null));
         session.setCurrentPage(page);
-
+        
         backupManager.getAllPlayersWithBackups().thenAccept(allPlayers -> {
             SchedulerUtil.runTask(plugin, () -> {
+                Component title = messageManager.getMessage("gui.titles.select-player");
+                Inventory inv = Bukkit.createInventory(new GUIHolder(GUIType.PLAYER_SELECT), 54, title);
+
                 int itemsPerPage = 45;
                 int startIndex = page * itemsPerPage;
                 int endIndex = Math.min(startIndex + itemsPerPage, allPlayers.size());
@@ -310,7 +309,8 @@ public class GUIManager {
 
             int slot = 45;
 
-            inv.setItem(slot++, createActionItem(Material.EMERALD, "gui.buttons.restore-full"));
+            inv.setItem(slot++, createActionItem(Material.EMERALD, "gui.buttons.restore-full", 
+                List.of("gui.lore.add-items-info", "gui.lore.add-items-overflow")));
 
             if (configManager.getConfig().getBoolean("restore.buttons.restore-enderchest", true)) {
                 inv.setItem(slot++, createActionItem(Material.ENDER_CHEST, "gui.buttons.view-enderchest"));
@@ -328,13 +328,8 @@ public class GUIManager {
                 inv.setItem(slot++, createActionItem(Material.SHULKER_BOX, "gui.buttons.export-shulker"));
             }
 
-            Player target = Bukkit.getPlayer(backup.getPlayerUuid());
-            boolean offlineRestoreEnabled = configManager.getConfig().getBoolean("offline-restore.enabled", true);
-            if (target != null && !target.isOnline() && offlineRestoreEnabled && slot <= 50) {
-                inv.setItem(slot++, createActionItem(Material.CLOCK, "gui.buttons.schedule-offline-restore"));
-            }
-
-            inv.setItem(52, createActionItem(Material.ORANGE_DYE, "gui.buttons.overwrite-current"));
+            inv.setItem(52, createActionItem(Material.ORANGE_DYE, "gui.buttons.overwrite-current",
+                List.of("gui.lore.overwrite-info")));
             inv.setItem(53, createNavItem(Material.BARRIER, "gui.back"));
 
             viewer.openInventory(inv);
@@ -403,6 +398,22 @@ public class GUIManager {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             meta.displayName(messageManager.getMessage(messageKey));
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    private ItemStack createActionItem(@NotNull Material material, @NotNull String messageKey, @NotNull List<String> loreKeys) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.displayName(messageManager.getMessage(messageKey));
+            List<Component> lore = new ArrayList<>();
+            lore.add(Component.empty());
+            for (String loreKey : loreKeys) {
+                lore.add(messageManager.getMessage(loreKey));
+            }
+            meta.lore(lore);
             item.setItemMeta(meta);
         }
         return item;

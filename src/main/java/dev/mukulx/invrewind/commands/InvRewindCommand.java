@@ -41,6 +41,8 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
     private final InvRewindForceCommand forceCommand;
     private final ExportCommand exportCommand;
     private final ImportCommand importCommand;
+    private List<String> cachedPlayerNames = new ArrayList<>();
+    private long lastCacheUpdate = 0;
 
     public InvRewindCommand(@NotNull InvRewind plugin, @NotNull GUIManager guiManager,
                             @NotNull MessageManager messageManager, @NotNull ExportCommand exportCommand,
@@ -51,6 +53,28 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
         this.forceCommand = new InvRewindForceCommand(plugin, plugin.getBackupManager(), messageManager);
         this.exportCommand = exportCommand;
         this.importCommand = importCommand;
+        
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            cachedPlayerNames.add(player.getName());
+        }
+        
+        updatePlayerCache();
+    }
+
+    private void updatePlayerCache() {
+        plugin.getBackupManager().getAllPlayersWithBackups().thenAccept(players -> {
+            List<String> names = new ArrayList<>();
+            for (var entry : players) {
+                names.add(entry.getValue());
+            }
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!names.contains(player.getName())) {
+                    names.add(player.getName());
+                }
+            }
+            cachedPlayerNames = names;
+            lastCacheUpdate = System.currentTimeMillis();
+        });
     }
 
     @Override
@@ -67,7 +91,6 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 0) {
-
             guiManager.openPlayerSelectGUI(player);
             messageManager.sendMessage(player, "commands.invrewind.opening-gui");
             return true;
@@ -96,7 +119,8 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-            Player target = Bukkit.getPlayer(args[0]);
+            String targetName = args[0];
+            Player target = Bukkit.getPlayer(targetName);
             if (target != null) {
                 guiManager.openBackupTypeGUI(player, target.getUniqueId());
                 messageManager.sendMessage(player, "commands.invrewind.opening-gui");
@@ -104,23 +128,30 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
             }
 
             plugin.getBackupManager().getAllPlayersWithBackups().thenAccept(players -> {
+                boolean found = false;
                 for (var entry : players) {
-                    if (entry.getValue().equalsIgnoreCase(args[0])) {
-                        guiManager.openBackupTypeGUI(player, entry.getKey());
-                        messageManager.sendMessage(player, "commands.invrewind.opening-gui");
-                        return;
+                    if (entry.getValue().equalsIgnoreCase(targetName)) {
+                        dev.mukulx.invrewind.util.SchedulerUtil.runTask(plugin, () -> {
+                            guiManager.openBackupTypeGUI(player, entry.getKey());
+                            messageManager.sendMessage(player, "commands.invrewind.opening-gui");
+                        });
+                        found = true;
+                        break;
                     }
                 }
                 
-                messageManager.sendMessage(player, "general.player-not-found",
-                    Map.of("player", args[0]));
+                if (!found) {
+                    dev.mukulx.invrewind.util.SchedulerUtil.runTask(plugin, () -> {
+                        messageManager.sendMessage(player, "general.player-not-found",
+                            Map.of("player", targetName));
+                    });
+                }
             });
             
             return true;
         }
 
         if (args.length >= 2 && args[0].equalsIgnoreCase("forcebackup")) {
-
             String[] forceArgs = new String[args.length - 1];
             System.arraycopy(args, 1, forceArgs, 0, args.length - 1);
             return forceCommand.onCommand(sender, command, label, forceArgs);
@@ -165,17 +196,10 @@ public class InvRewindCommand implements CommandExecutor, TabCompleter {
             }
 
             if (sender.hasPermission("invrewind.restore.others")) {
-                plugin.getBackupManager().getAllPlayersWithBackups().thenAccept(players -> {
-                    for (var entry : players) {
-                        completions.add(entry.getValue());
-                    }
-                });
-                
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!completions.contains(player.getName())) {
-                        completions.add(player.getName());
-                    }
+                if (System.currentTimeMillis() - lastCacheUpdate > 30000) {
+                    updatePlayerCache();
                 }
+                completions.addAll(cachedPlayerNames);
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("forcebackup")) {
             completions.add("all");

@@ -630,26 +630,56 @@ public class BackupManager {
 
                 if (isYamlMode()) {
                     java.io.File backupsFolder = new java.io.File(plugin.getDataFolder(), "backups");
+                    plugin.getLogger().info("[DEBUG] Scanning YAML backups folder: " + backupsFolder.getAbsolutePath());
+                    
                     if (backupsFolder.exists() && backupsFolder.isDirectory()) {
-                        for (java.io.File typeFolder : backupsFolder.listFiles()) {
-                            if (typeFolder.isDirectory()) {
-                                for (java.io.File playerFolder : typeFolder.listFiles()) {
-                                    if (playerFolder.isDirectory()) {
-                                        String folderName = playerFolder.getName();
-                                        int underscoreIndex = folderName.lastIndexOf('_');
-                                        if (underscoreIndex > 0) {
-                                            String uuidStr = folderName.substring(underscoreIndex + 1);
-                                            String playerName = folderName.substring(0, underscoreIndex);
-                                            try {
-                                                UUID uuid = UUID.fromString(uuidStr);
-                                                playersMap.putIfAbsent(uuid, playerName);
-                                            } catch (IllegalArgumentException ignored) {}
+                        java.io.File[] typeFolders = backupsFolder.listFiles();
+                        plugin.getLogger().info("[DEBUG] Found " + (typeFolders != null ? typeFolders.length : 0) + " type folders");
+                        
+                        if (typeFolders != null) {
+                            for (java.io.File typeFolder : typeFolders) {
+                                if (typeFolder.isDirectory()) {
+                                    plugin.getLogger().info("[DEBUG] Scanning type folder: " + typeFolder.getName());
+                                    java.io.File[] playerFolders = typeFolder.listFiles();
+                                    plugin.getLogger().info("[DEBUG] Found " + (playerFolders != null ? playerFolders.length : 0) + " player folders in " + typeFolder.getName());
+                                    
+                                    if (playerFolders != null) {
+                                        for (java.io.File playerFolder : playerFolders) {
+                                            if (playerFolder.isDirectory()) {
+                                                String playerName = playerFolder.getName();
+                                                plugin.getLogger().info("[DEBUG] Checking player folder: " + playerName);
+                                                
+                                                java.io.File[] backupFiles = playerFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+                                                plugin.getLogger().info("[DEBUG] Found " + (backupFiles != null ? backupFiles.length : 0) + " backup files for " + playerName);
+                                                
+                                                if (backupFiles != null && backupFiles.length > 0) {
+                                                    try {
+                                                        plugin.getLogger().info("[DEBUG] Reading backup file: " + backupFiles[0].getName());
+                                                        org.bukkit.configuration.file.YamlConfiguration yaml = 
+                                                            org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(backupFiles[0]);
+                                                        String uuidStr = yaml.getString("player-uuid");
+                                                        plugin.getLogger().info("[DEBUG] UUID from file: " + uuidStr);
+                                                        if (uuidStr != null) {
+                                                            UUID uuid = UUID.fromString(uuidStr);
+                                                            playersMap.putIfAbsent(uuid, playerName);
+                                                            plugin.getLogger().info("[DEBUG] Added player: " + playerName + " (" + uuid + ")");
+                                                        } else {
+                                                            plugin.getLogger().warning("[DEBUG] No UUID found in backup file for " + playerName);
+                                                        }
+                                                    } catch (Exception e) {
+                                                        plugin.getLogger().warning("Failed to read UUID from backup file for " + playerName + ": " + e.getMessage());
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                    } else {
+                        plugin.getLogger().warning("[DEBUG] Backups folder does not exist or is not a directory");
                     }
+                    plugin.getLogger().info("[DEBUG] Total players found: " + playersMap.size());
                 } else {
                     String sql = "SELECT DISTINCT player_uuid, player_name FROM invrewind_backups ORDER BY player_name";
                     try (Connection conn = databaseManager.getConnection();

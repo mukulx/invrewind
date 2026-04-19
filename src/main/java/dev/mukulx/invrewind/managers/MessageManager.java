@@ -20,9 +20,6 @@ package dev.mukulx.invrewind.managers;
 import dev.mukulx.invrewind.InvRewind;
 import dev.mukulx.invrewind.config.ConfigManager;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -41,39 +38,6 @@ public class MessageManager {
         this.plugin = plugin;
         this.configManager = configManager;
         this.miniMessage = MiniMessage.miniMessage();
-    }
-
-    public Component createGradientText(String text, TextColor startColor, TextColor endColor) {
-        Component result = Component.empty();
-        int length = text.length();
-
-        for (int i = 0; i < length; i++) {
-            float ratio = (float) i / (length - 1);
-            if (length == 1) ratio = 0;
-
-            int r = (int) (startColor.red() + ratio * (endColor.red() - startColor.red()));
-            int g = (int) (startColor.green() + ratio * (endColor.green() - startColor.green()));
-            int b = (int) (startColor.blue() + ratio * (endColor.blue() - startColor.blue()));
-
-            TextColor color = TextColor.color(r, g, b);
-            result = result.append(Component.text(text.charAt(i))
-                .color(color)
-                .decoration(TextDecoration.ITALIC, false));
-        }
-
-        return result;
-    }
-
-    public Component toSmallCaps(String text) {
-        String smallCaps = text.toLowerCase()
-            .replace("a", "ᴀ").replace("b", "ʙ").replace("c", "ᴄ").replace("d", "ᴅ")
-            .replace("e", "ᴇ").replace("f", "ғ").replace("g", "ɢ").replace("h", "ʜ")
-            .replace("i", "ɪ").replace("j", "ᴊ").replace("k", "ᴋ").replace("l", "ʟ")
-            .replace("m", "ᴍ").replace("n", "ɴ").replace("o", "ᴏ").replace("p", "ᴘ")
-            .replace("q", "ǫ").replace("r", "ʀ").replace("s", "s").replace("t", "ᴛ")
-            .replace("u", "ᴜ").replace("v", "ᴠ").replace("w", "ᴡ").replace("x", "x")
-            .replace("y", "ʏ").replace("z", "ᴢ");
-        return Component.text(smallCaps).decoration(TextDecoration.ITALIC, false);
     }
 
     public void sendMessage(@NotNull CommandSender sender, @NotNull String path) {
@@ -158,10 +122,5 @@ public class MessageManager {
     @NotNull
     public Component parseMessage(@NotNull String message) {
         return miniMessage.deserialize(message);
-    }
-
-    @NotNull
-    public Component getGradientComponent(@NotNull String text, @NotNull TextColor startColor, @NotNull TextColor endColor) {
-        return createGradientText(text, startColor, endColor);
     }
 }

@@ -25,6 +25,7 @@ import dev.mukulx.invrewind.model.BackupData;
 import dev.mukulx.invrewind.model.PendingRestore;
 import dev.mukulx.invrewind.util.RestoreUtil;
 import dev.mukulx.invrewind.util.SchedulerUtil;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -44,6 +45,7 @@ public class OfflineRestoreListener implements Listener {
     private final OfflineRestoreManager offlineRestoreManager;
     private final BackupManager backupManager;
     private final ConfigManager configManager;
+    private final MiniMessage miniMessage;
 
     public OfflineRestoreListener(@NotNull InvRewind plugin,
                                   @NotNull OfflineRestoreManager offlineRestoreManager,
@@ -53,6 +55,7 @@ public class OfflineRestoreListener implements Listener {
         this.offlineRestoreManager = offlineRestoreManager;
         this.backupManager = backupManager;
         this.configManager = configManager;
+        this.miniMessage = MiniMessage.miniMessage();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -117,7 +120,7 @@ public class OfflineRestoreListener implements Listener {
             }
 
             if (backup == null) {
-                    player.sendMessage("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴛᴏʀᴇ: ʙᴀᴄᴋᴜᴘ ɴᴏᴛ ғᴏᴜɴᴅ</gradient>");
+                    player.sendMessage(miniMessage.deserialize("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴛᴏʀᴇ: ʙᴀᴄᴋᴜᴘ ɴᴏᴛ ғᴏᴜɴᴅ</gradient>"));
                     plugin.getLogger().warning("backup #" + pending.getBackupId() + " not found for player: " + player.getName());
                 offlineRestoreManager.removePendingRestore(playerUuid);
                 offlineRestoreManager.setProcessing(playerUuid, false);
@@ -133,20 +136,20 @@ public class OfflineRestoreListener implements Listener {
                     offlineRestoreManager.removePendingRestore(playerUuid);
                     offlineRestoreManager.setProcessing(playerUuid, false);
 
-                    player.sendMessage("<gradient:#00FF88:#00CCAA>ʏᴏᴜʀ ɪɴᴠᴇɴᴛᴏʀʏ ʜᴀs ʙᴇᴇɴ ʀᴇsᴛᴏʀᴇᴅ</gradient>");
+                    player.sendMessage(miniMessage.deserialize("<gradient:#00FF88:#00CCAA>ʏᴏᴜʀ ɪɴᴠᴇɴᴛᴏʀʏ ʜᴀs ʙᴇᴇɴ ʀᴇsᴛᴏʀᴇᴅ!</gradient>"));
                     plugin.getLogger().info("offline restore completed for player: " + player.getName());
                     notifyAdminSuccess(pending, player);
 
                 } catch (Exception e) {
                     plugin.getLogger().log(Level.SEVERE, "failed to apply offline restore for " + player.getName(), e);
-                    player.sendMessage("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ</gradient>");
+                    player.sendMessage(miniMessage.deserialize("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ!</gradient>"));
                     offlineRestoreManager.setProcessing(playerUuid, false);
                     notifyAdminFailed(pending, "error during restore");
                 }
             });
         }).exceptionally(ex -> {
             plugin.getLogger().log(Level.SEVERE, "failed to load backup for offline restore", ex);
-            player.sendMessage("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ</gradient>");
+            player.sendMessage(miniMessage.deserialize("<gradient:#FF4444:#CC0000>ғᴀɪʟᴇᴅ ᴛᴏ ʀᴇsᴛᴏʀᴇ ɪɴᴠᴇɴᴛᴏʀʏ!</gradient>"));
             offlineRestoreManager.setProcessing(playerUuid, false);
             notifyAdminFailed(pending, "failed to load backup");
             return null;
@@ -155,7 +158,11 @@ public class OfflineRestoreListener implements Listener {
 
     private void applyRestore(@NotNull Player player, @NotNull BackupData backup, @NotNull PendingRestore pending) {
         if (pending.isRestoreInventory()) {
-            RestoreUtil.restoreInventory(player, backup);
+            if (pending.isOverwrite()) {
+                RestoreUtil.restoreInventory(player, backup);
+            } else {
+                RestoreUtil.addInventoryItems(player, backup);
+            }
         }
         if (pending.isRestoreArmor()) {
             RestoreUtil.restoreArmor(player, backup);
@@ -193,21 +200,21 @@ public class OfflineRestoreListener implements Listener {
     private void notifyAdminStarting(@NotNull PendingRestore pending, @NotNull Player player) {
         Player admin = Bukkit.getPlayer(pending.getScheduledBy());
         if (admin != null && admin.isOnline()) {
-            admin.sendMessage("<gradient:#FFAA00:#FF8800>ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ sᴛᴀʀᴛɪɴɢ ғᴏʀ</gradient> <gradient:#00FF88:#00CCAA>" + player.getName() + "</gradient> <gradient:#FFAA00:#FF8800>(ʙᴀᴄᴋᴜᴘ #" + pending.getBackupId() + ")</gradient>");
+            admin.sendMessage(miniMessage.deserialize("<gradient:#FFAA00:#FF8800>ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ sᴛᴀʀᴛɪɴɢ ғᴏʀ</gradient> <gradient:#00FF88:#00CCAA>" + player.getName() + "</gradient> <gradient:#FFAA00:#FF8800>(ʙᴀᴄᴋᴜᴘ #" + pending.getBackupId() + ")</gradient>"));
         }
     }
 
     private void notifyAdminSuccess(@NotNull PendingRestore pending, @NotNull Player player) {
         Player admin = Bukkit.getPlayer(pending.getScheduledBy());
         if (admin != null && admin.isOnline()) {
-            admin.sendMessage("<gradient:#00FF88:#00CCAA>ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + player.getName() + "</gradient>");
+            admin.sendMessage(miniMessage.deserialize("<gradient:#00FF88:#00CCAA>ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + player.getName() + "</gradient>"));
         }
     }
 
     private void notifyAdminFailed(@NotNull PendingRestore pending, @NotNull String reason) {
         Player admin = Bukkit.getPlayer(pending.getScheduledBy());
         if (admin != null && admin.isOnline()) {
-            admin.sendMessage("<gradient:#FF4444:#CC0000>ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ ғᴀɪʟᴇᴅ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + pending.getPlayerName() + "</gradient><gradient:#FF4444:#CC0000>: " + reason + "</gradient>");
+            admin.sendMessage(miniMessage.deserialize("<gradient:#FF4444:#CC0000>ᴏғғʟɪɴᴇ ʀᴇsᴛᴏʀᴇ ғᴀɪʟᴇᴅ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + pending.getPlayerName() + "</gradient><gradient:#FF4444:#CC0000>: " + reason + "</gradient>"));
         }
     }
 
@@ -215,7 +222,7 @@ public class OfflineRestoreListener implements Listener {
         Player admin = Bukkit.getPlayer(pending.getScheduledBy());
         if (admin != null && admin.isOnline()) {
             long expiryHours = configManager.getConfig().getLong("offline-restore.expiry-hours", 24);
-            admin.sendMessage("<gradient:#FF4444:#CC0000>ᴘᴇɴᴅɪɴɢ ʀᴇsᴛᴏʀᴇ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + pending.getPlayerName() + "</gradient> <gradient:#FF4444:#CC0000>ʜᴀs ᴇxᴘɪʀᴇᴅ (ɴᴏᴛ ʟᴏɢɢᴇᴅ ɪɴ ᴡɪᴛʜɪɴ " + expiryHours + " ʜᴏᴜʀs)</gradient>");
+            admin.sendMessage(miniMessage.deserialize("<gradient:#FF4444:#CC0000>ᴘᴇɴᴅɪɴɢ ʀᴇsᴛᴏʀᴇ ғᴏʀ</gradient> <gradient:#FFAA00:#FF8800>" + pending.getPlayerName() + "</gradient> <gradient:#FF4444:#CC0000>ʜᴀs ᴇxᴘɪʀᴇᴅ (ɴᴏᴛ ʟᴏɢɢᴇᴅ ɪɴ ᴡɪᴛʜɪɴ " + expiryHours + " ʜᴏᴜʀs)</gradient>"));
         }
     }
 

@@ -65,61 +65,52 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.VERSION }}
           name: InvRewind ${{ steps.get_version.outputs.VERSION }}
           body: |
-            ## What's Changed
+            ## What's New in v1.3.2
             
-            ### New Features
-            - **Offline Player Restore System**: Schedule inventory restores for offline players
-              - Restores automatically apply when player joins the server
-              - Configurable 24-hour expiry (admin notified if player doesn't join in time)
-              - Player freeze during restore (prevents movement, inventory actions, item pickup/drop)
-              - Title message shown during restore process
-              - Full selective restore support (inventory, armor, offhand, ender chest, health, hunger, XP, location)
-              - Latest scheduled restore overwrites previous ones
-              - Admin notifications on join, completion, failure, and expiry
-              - Console logging for all restore events
-              - Works with all database types (YAML, SQLite, MySQL)
-              - Can be fully enabled/disabled via config (`offline-restore.enabled`)
+            ### Major Improvements
             
-            ### GUI Improvements
-            - **All Players Display**: Shows both online and offline players with backups in `/invrewind` GUI
-              - Online players shown first, then offline players alphabetically
-              - Status indicator (online/offline) in player skull lore
-              - "Schedule Offline Restore" button appears when target player is offline (if feature enabled)
-              - One-click scheduling with automatic configuration
+            #### 🎨 Fixed Gradient Colors & Messages
+            - **Integrated Adventure API 4.17.0**: All gradient messages now render properly with smooth color transitions
+            - **MiniMessage Support**: Full support for `<gradient>` tags in all messages
+            - **Fixed Color Rendering**: Titles, chat messages, and GUI text now display gradients correctly
+            - **Consistent Styling**: All messages use small caps gradient format throughout the plugin
             
-            ### Command Improvements
-            - Tab completion now includes offline player names with backups
-            - `/invrewind <playername>` works for both online and offline players
-            - Async player lookup for offline players
-            - All commands support both online and offline player targets
+            #### 🔧 Fixed YAML Player Detection
+            - **Fixed `/ir` not showing offline players in YAML mode**: Now correctly scans backup folders and reads UUIDs from files
+            - **Improved Folder Parsing**: Reads player UUIDs directly from backup YAML files instead of folder names
+            - **Works with all storage modes**: YAML, SQLite, and MySQL all show offline players correctly
+            - **Added debug logging**: Helps troubleshoot any scanning issues
             
-            ### Message Updates
-            - All offline restore messages use small caps gradient format
-            - Database fallback messages converted to small caps gradient
-            - Consistent styling across all user-facing messages
-            - Improved readability and visual consistency
+            #### 📦 Restore vs Overwrite Clarity
+            - **"Add Backup Items" button** (Emerald): Keeps current items and adds backup items to inventory
+              - Excess items drop on ground if inventory is full
+              - Perfect for recovering lost items without losing current gear
+            - **"Overwrite Inventory" button** (Orange Dye): Clears inventory first, then restores backup
+              - Complete inventory replacement
+              - Useful for full rollbacks
+            - **Clear button descriptions**: Lore text explains the difference between the two modes
             
-            ### Configuration
-            - New `offline-restore` config section with full customization:
-              - `enabled`: Enable/disable offline restore feature completely (default: true)
-              - `expiry-hours`: Time before pending restore expires (default: 24)
-              - `expiry-check-interval`: How often to check for expired restores (default: 3600 seconds)
-              - `apply-delay-ticks`: Delay before applying restore after join (default: 20 ticks)
-              - `freeze-player`: Prevent player actions during restore (default: true)
-              - Customizable title messages and timing
-            - Config version bumped to 3 with automatic migration
-            - All existing settings preserved during migration
+            #### 🌐 Offline Player Restore Improvements
+            - **Smart offline handling**: Clicking restore/overwrite on offline players schedules the restore
+            - **Restore type preserved**: System remembers whether to add items or overwrite when player joins
+            - **Database schema updated**: New `overwrite` field tracks restore mode
+            - **Backward compatible**: Old pending restores default to "add items" mode
             
-            ### Technical Details
-            - Added `OfflineRestoreManager` for handling pending restores
-            - Added `OfflineRestoreListener` for join events and player freeze
-            - Added `PendingRestore` model to store all restore configuration
-            - Added `getAllPlayersWithBackups()` method to BackupManager
-            - Supports YAML folder scanning and SQL database queries
-            - Automatic cleanup of expired restores
-            - Handles edge cases: player quit during restore, server restart, rejoin scenarios
-            - Sorts players: online first, then alphabetically
-            - Full Folia and Paper compatibility maintained
+            ### Technical Changes
+            - Added Adventure API and MiniMessage dependencies (shaded and relocated)
+            - Updated MessageManager to use MiniMessage's native gradient parsing
+            - Removed manual gradient implementation in favor of MiniMessage
+            - Added `RestoreUtil.addInventoryItems()` method for non-destructive restores
+            - Updated `PendingRestore` model with `overwrite` flag
+            - Database migration support for new `overwrite` column (MySQL, SQLite, YAML)
+            - All direct `sendMessage()` calls now use MiniMessage for proper formatting
+            
+            ### Bug Fixes
+            - Fixed gradient messages not rendering colors
+            - Fixed offline players not appearing in `/ir` GUI with YAML storage
+            - Fixed tab completion not showing offline players
+            - Fixed color codes showing as raw text instead of colors
+            - Fixed title messages in offline restore showing broken formatting
             
             **Full Changelog**: https://github.com/${{ github.repository }}/commits/v${{ steps.get_version.outputs.VERSION }}
           files: build/libs/InvRewind-*.jar
